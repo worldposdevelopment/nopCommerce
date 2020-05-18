@@ -315,8 +315,6 @@ namespace Nop.Web.Models.Catalog
 
         public partial class ProductEstimateShippingModel : EstimateShippingModel
         {
-            public bool IsEnabled { get; set; }
-
             public int ProductId { get; set; }
         }
 
