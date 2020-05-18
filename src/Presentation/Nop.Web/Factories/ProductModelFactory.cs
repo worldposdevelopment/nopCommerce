@@ -1339,20 +1339,17 @@ namespace Nop.Web.Factories
                 };
 
                 var estimateShippingModel = _shoppingCartModelFactory.PrepareEstimateShippingModel(new[] { wrappedProduct });
-                if (estimateShippingModel.Enabled)
-                {
-                    model.ProductEstimateShipping = new ProductDetailsModel.ProductEstimateShippingModel()
-                    {
-                        ProductId = product.Id,
-                        Enabled = estimateShippingModel.Enabled,
-                        CountryId = estimateShippingModel.CountryId,
-                        StateProvinceId = estimateShippingModel.StateProvinceId,
-                        ZipPostalCode = estimateShippingModel.ZipPostalCode,
-                        AvailableCountries = estimateShippingModel.AvailableCountries,
-                        AvailableStates = estimateShippingModel.AvailableStates
-                    };
-                }
+
+                model.ProductEstimateShipping.ProductId = product.Id;
+                model.ProductEstimateShipping.Enabled = estimateShippingModel.Enabled;
+                model.ProductEstimateShipping.CountryId = estimateShippingModel.CountryId;
+                model.ProductEstimateShipping.StateProvinceId = estimateShippingModel.StateProvinceId;
+                model.ProductEstimateShipping.ZipPostalCode = estimateShippingModel.ZipPostalCode;
+                model.ProductEstimateShipping.AvailableCountries = estimateShippingModel.AvailableCountries;
+                model.ProductEstimateShipping.AvailableStates = estimateShippingModel.AvailableStates;
             }
+            else
+                model.ProductEstimateShipping.Enabled = false;
 
             //associated products
             if (product.ProductType == ProductType.GroupedProduct)

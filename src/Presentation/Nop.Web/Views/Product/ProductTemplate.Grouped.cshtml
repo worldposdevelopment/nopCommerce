@@ -164,10 +164,8 @@
                                         dataDictAddToCart.TemplateInfo.HtmlFieldPrefix = $"addtocart_{variant.Id}";
                                         @await Html.PartialAsync("_AddToCart", variant.AddToCart, dataDictAddToCart)
                                     }
-
                                     <!--estimate shipping-->
-                                    @if (!variant.IsFreeShipping)
-                                    {
+                                    @{
                                         var dataDictEstimateShipping = new ViewDataDictionary(ViewData);
                                         dataDictEstimateShipping.TemplateInfo.HtmlFieldPrefix = $"estimate_shipping_{variant.Id}";
                                         @await Html.PartialAsync("_ProductEstimateShipping", variant.ProductEstimateShipping, dataDictEstimateShipping)

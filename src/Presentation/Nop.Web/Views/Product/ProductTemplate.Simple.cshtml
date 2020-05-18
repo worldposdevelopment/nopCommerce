@@ -118,10 +118,7 @@
                             dataDictAddToCart.TemplateInfo.HtmlFieldPrefix = $"addtocart_{Model.Id}";
                             @await Html.PartialAsync("_AddToCart", Model.AddToCart, dataDictAddToCart)
 
-                            if (!Model.IsFreeShipping)
-                            {
-                                @await Html.PartialAsync("_ProductEstimateShipping", Model.ProductEstimateShipping)
-                            }
+                            @await Html.PartialAsync("_ProductEstimateShipping", Model.ProductEstimateShipping)
                         }
                         <!--wishlist, compare, email a friend-->
                         <div class="overview-buttons">
