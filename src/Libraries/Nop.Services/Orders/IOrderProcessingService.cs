@@ -24,6 +24,7 @@ namespace Nop.Services.Orders
         /// <param name="processPaymentRequest">Process payment request</param>
         /// <returns>Place order result</returns>
         PlaceOrderResult PlaceOrder(ProcessPaymentRequest processPaymentRequest);
+        PlaceOrderResult PlaceOnlineRaffleOrder(ProcessPaymentRequest processPaymentRequest);
 
         /// <summary>
         /// Update order totals

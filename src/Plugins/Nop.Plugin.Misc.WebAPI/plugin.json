@@ -1,0 +1,11 @@
+﻿{
+  "Group": "Misc",
+  "FriendlyName": "HS Web API",
+  "SystemName": "Misc.WebAPI",
+  "Version": "1.00",
+  "SupportedVersions": [ "4.30" ],
+  "Author": "Author Name",
+  "DisplayOrder": 1,
+  "FileName": "Nop.Plugin.Misc.WebAPI.dll",
+  "Description": ""
+}

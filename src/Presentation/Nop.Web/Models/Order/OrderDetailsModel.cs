@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Nop.Web.Framework.Models;
 using Nop.Web.Models.Common;
+using Nop.Web.Models.Media;
 
 namespace Nop.Web.Models.Order
 {
@@ -93,6 +94,8 @@ namespace Nop.Web.Models.Order
             public string SubTotal { get; set; }
             public int Quantity { get; set; }
             public string AttributeInfo { get; set; }
+            public PictureModel Picture { get; set; }
+            public bool HasReviewed { get; set; }
             public string RentalInfo { get; set; }
 
             public string VendorName { get; set; }

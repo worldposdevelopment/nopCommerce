@@ -1,4 +1,4 @@
-namespace Nop.Core.Domain.Orders
+﻿namespace Nop.Core.Domain.Orders
 {
     /// <summary>
     /// Represents a shopping cart type
@@ -13,6 +13,10 @@ namespace Nop.Core.Domain.Orders
         /// <summary>
         /// Wishlist
         /// </summary>
-        Wishlist = 2
+        Wishlist = 2,
+
+        OfflineRaffles = 3,
+
+        OnlineRaffles = 4,
     }
 }

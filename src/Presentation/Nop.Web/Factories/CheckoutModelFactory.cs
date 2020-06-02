@@ -336,7 +336,7 @@ namespace Nop.Web.Factories
         }
 
         /// <summary>
-        /// Prepare shipping method model
+        /// Prepare shipping method modelz
         /// </summary>
         /// <param name="cart">Cart</param>
         /// <param name="shippingAddress">Shipping address</param>

@@ -41,6 +41,7 @@ namespace Nop.Core.Domain.Orders
         /// Gets or sets the quantity
         /// </summary>
         public int Quantity { get; set; }
+        public int SelectedForCheckout { get; set; }
 
         /// <summary>
         /// Gets or sets the rental product start date (null if it's not a rental product)

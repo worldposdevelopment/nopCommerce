@@ -30,6 +30,7 @@ namespace Nop.Web.Models.Catalog
         public string ProductName { get; set; }
 
         public string ProductSeName { get; set; }
+        public bool HasReviewed { get; set; }
 
         public IList<ProductReviewModel> Items { get; set; }
 

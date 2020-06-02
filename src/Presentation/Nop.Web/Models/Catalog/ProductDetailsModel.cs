@@ -8,6 +8,7 @@ using Nop.Web.Framework.Mvc.ModelBinding;
 using Nop.Web.Framework.Models;
 using Nop.Web.Models.Media;
 using Nop.Web.Models.ShoppingCart;
+using System.Drawing.Printing;
 
 namespace Nop.Web.Models.Catalog
 {
@@ -25,7 +26,7 @@ namespace Nop.Web.Models.Catalog
             VendorModel = new VendorBriefInfoModel();
             Breadcrumb = new ProductBreadcrumbModel();
             ProductTags = new List<ProductTagModel>();
-            ProductSpecifications= new List<ProductSpecificationModel>();
+            ProductSpecifications = new List<ProductSpecificationModel>();
             ProductManufacturers = new List<ManufacturerBriefInfoModel>();
             ProductReviewOverview = new ProductReviewOverviewModel();
             TierPrices = new List<TierPriceModel>();
@@ -111,6 +112,13 @@ namespace Nop.Web.Models.Catalog
         public bool DisplayDiscontinuedMessage { get; set; }
 
         public string CurrentStoreName { get; set; }
+        public bool IsOnlineRafflePrize { get; set; }
+        public bool IsOfflineRafflePrize { get; set; }
+        public bool IsPrelaunch { get; set; }
+        public DateTime? PrelaunchStartDateTime {get;set;}
+        public DateTime? PrelaunchEndDateTime { get; set; }
+        public bool InWishlist { get; set; }
+
 
         #region Nested Classes
 

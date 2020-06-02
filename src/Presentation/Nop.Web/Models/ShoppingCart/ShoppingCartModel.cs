@@ -17,6 +17,7 @@ namespace Nop.Web.Models.ShoppingCart
             GiftCardBox = new GiftCardBoxModel();
             CheckoutAttributes = new List<CheckoutAttributeModel>();
             OrderReviewData = new OrderReviewDataModel();
+            TotalFee = new CalculatedFee();
 
             ButtonPaymentMethodViewComponentNames = new List<string>();
         }
@@ -39,6 +40,7 @@ namespace Nop.Web.Models.ShoppingCart
         public DiscountBoxModel DiscountBox { get; set; }
         public GiftCardBoxModel GiftCardBox { get; set; }
         public OrderReviewDataModel OrderReviewData { get; set; }
+        public CalculatedFee TotalFee { get; set; }
 
         public IList<string> ButtonPaymentMethodViewComponentNames { get; set; }
 
@@ -76,6 +78,7 @@ namespace Nop.Web.Models.ShoppingCart
             public int? MaximumDiscountedQty { get; set; }
 
             public int Quantity { get; set; }
+            public int SelectedForCheckout { get; set; }
             public List<SelectListItem> AllowedQuantities { get; set; }
             
             public string AttributeInfo { get; set; }
@@ -189,6 +192,14 @@ namespace Nop.Web.Models.ShoppingCart
             public string PaymentMethod { get; set; }
 
             public Dictionary<string, object> CustomValues { get; set; }
+        }
+        public partial class CalculatedFee : BaseNopModel
+        {
+            public string Total { get; set; }
+            public string Subtotal { get; set; }
+            public string Shippingfee { get; set; }
+            public string DiscountAmount { get; set; }
+            public string SubTotalWithoutDiscount { get; set; }
         }
 
         #endregion

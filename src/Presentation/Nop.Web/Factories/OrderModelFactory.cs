@@ -21,6 +21,7 @@ using Nop.Services.Shipping;
 using Nop.Services.Vendors;
 using Nop.Web.Models.Common;
 using Nop.Web.Models.Order;
+using Org.BouncyCastle.Crypto.Engines;
 
 namespace Nop.Web.Factories
 {
@@ -414,8 +415,11 @@ namespace Nop.Web.Factories
 
             foreach (var orderItem in orderItems)
             {
+                bool hasReviewed = false;
                 var product = _productService.GetProductById(orderItem.ProductId);
-
+                var review = _productService.GetAllProductReviews(customer.Id,null,null,null,null,1,product.Id,1,false,0, int.MaxValue).FirstOrDefault();
+                if (review != null)
+                    hasReviewed = true;
                 var orderItemModel = new OrderDetailsModel.OrderItemModel
                 {
                     Id = orderItem.Id,
@@ -427,6 +431,7 @@ namespace Nop.Web.Factories
                     ProductSeName = _urlRecordService.GetSeName(product),
                     Quantity = orderItem.Quantity,
                     AttributeInfo = orderItem.AttributeDescription,
+                    HasReviewed = hasReviewed
                 };
                 //rental info
                 if (product.IsRental)

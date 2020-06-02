@@ -18,6 +18,8 @@ namespace Nop.Services.Orders
         /// <param name="shoppingCartItem">Shopping cart item</param>
         /// <param name="resetCheckoutData">A value indicating whether to reset checkout data</param>
         /// <param name="ensureOnlyActiveCheckoutAttributes">A value indicating whether to ensure that only active checkout attributes are attached to the current customer</param>
+        ///         
+     void SetSelectShoppingCartItem(Customer customer, int shoppingCartItemId, Boolean selected, ShoppingCartType? shoppingCartType = null);
         void DeleteShoppingCartItem(ShoppingCartItem shoppingCartItem, bool resetCheckoutData = true,
             bool ensureOnlyActiveCheckoutAttributes = false);
 
@@ -273,7 +275,7 @@ namespace Nop.Services.Orders
             ShoppingCartType shoppingCartType, int storeId, string attributesXml = null,
             decimal customerEnteredPrice = decimal.Zero,
             DateTime? rentalStartDate = null, DateTime? rentalEndDate = null,
-            int quantity = 1, bool addRequiredProducts = true);
+            int quantity = 1, bool addRequiredProducts = true, Boolean selected = false);
 
         /// <summary>
         /// Updates the shopping cart item
@@ -291,7 +293,7 @@ namespace Nop.Services.Orders
             int shoppingCartItemId, string attributesXml,
             decimal customerEnteredPrice,
             DateTime? rentalStartDate = null, DateTime? rentalEndDate = null,
-            int quantity = 1, bool resetCheckoutData = true);
+            int quantity = 1, bool resetCheckoutData = true, bool selected = false);
 
         /// <summary>
         /// Migrate shopping cart

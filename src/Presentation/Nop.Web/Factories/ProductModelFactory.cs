@@ -1172,8 +1172,16 @@ namespace Nop.Web.Factories
                 StockAvailability = _productService.FormatStockMessage(product, string.Empty),
                 HasSampleDownload = product.IsDownload && product.HasSampleDownload,
                 DisplayDiscontinuedMessage = !product.Published && _catalogSettings.DisplayDiscontinuedMessageForUnpublishedProducts,
-                AvailableEndDate = product.AvailableEndDateTimeUtc
-            };
+                AvailableEndDate = product.AvailableEndDateTimeUtc,
+                IsOnlineRafflePrize = product.IsOnlineRafflePrize, 
+                IsOfflineRafflePrize = product.IsOfflineRafflePrize,
+                IsPrelaunch = product.IsPrelaunch,
+                PrelaunchStartDateTime = product.PrelaunchStartDateTime,
+                PrelaunchEndDateTime = product.PrelaunchEndDateTime
+
+
+
+    };
 
             //automatically generate product description?
             if (_seoSettings.GenerateProductMetaDescription && string.IsNullOrEmpty(model.MetaDescription))

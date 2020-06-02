@@ -384,6 +384,12 @@ namespace Nop.Core.Domain.Catalog
         /// Gets or sets a value indicating whether this item is available for Pre-Order
         /// </summary>
         public bool AvailableForPreOrder { get; set; }
+        public bool IsOnlineRafflePrize { get; set; }
+        public bool IsOfflineRafflePrize { get; set; }
+        public bool IsPrelaunch { get; set; }
+        public DateTime? PrelaunchStartDateTime { get; set; }
+        public DateTime? PrelaunchEndDateTime { get; set; }
+
 
         /// <summary>
         /// Gets or sets the start date and time of the product availability (for pre-order products)

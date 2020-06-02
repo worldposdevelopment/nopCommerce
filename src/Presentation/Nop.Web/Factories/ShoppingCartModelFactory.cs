@@ -375,6 +375,7 @@ namespace Nop.Web.Factories
                 throw new ArgumentNullException(nameof(sci));
 
             var product = _productService.GetProductById(sci.ProductId);
+       
 
             var cartItemModel = new ShoppingCartModel.ShoppingCartItemModel
             {
@@ -386,6 +387,7 @@ namespace Nop.Web.Factories
                 ProductSeName = _urlRecordService.GetSeName(product),
                 Quantity = sci.Quantity,
                 AttributeInfo = _productAttributeFormatter.FormatAttributes(product, sci.AttributesXml),
+                SelectedForCheckout = sci.SelectedForCheckout
             };
 
             //allow editing?

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Diagnostics;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Nop.Core;
@@ -637,6 +638,27 @@ namespace Nop.Services.Orders
         /// <param name="createdFromUtc">Created date from (UTC); pass null to load all records</param>
         /// <param name="createdToUtc">Created date to (UTC); pass null to load all records</param>
         /// <returns>Shopping Cart</returns>
+
+        public virtual void SetSelectShoppingCartItem(Customer customer, int shoppingCartItemId, Boolean selected, ShoppingCartType? shoppingCartType = null)
+        {
+            if (customer == null)
+                throw new ArgumentNullException(nameof(customer));
+
+            var items = _sciRepository.Table.Where(sci => sci.CustomerId == customer.Id);
+
+            var shoppingCartItem = _sciRepository.Table.FirstOrDefault(sci => sci.Id == shoppingCartItemId);
+            if (shoppingCartItem != null)
+            {
+                if(selected)
+                shoppingCartItem.SelectedForCheckout = 1;
+                else
+                    shoppingCartItem.SelectedForCheckout = 0;
+
+                _sciRepository.Update(shoppingCartItem);
+            }
+        }
+
+
         public virtual IList<ShoppingCartItem> GetShoppingCart(Customer customer, ShoppingCartType? shoppingCartType = null,
             int storeId = 0, int? productId = null, DateTime? createdFromUtc = null, DateTime? createdToUtc = null)
         {
@@ -1440,8 +1462,8 @@ namespace Nop.Services.Orders
             ShoppingCartType shoppingCartType, int storeId, string attributesXml = null,
             decimal customerEnteredPrice = decimal.Zero,
             DateTime? rentalStartDate = null, DateTime? rentalEndDate = null,
-            int quantity = 1, bool addRequiredProducts = true)
-        {
+            int quantity = 1, bool addRequiredProducts = true, Boolean selected = false)
+        { 
             if (customer == null)
                 throw new ArgumentNullException(nameof(customer));
 
@@ -1497,7 +1519,7 @@ namespace Nop.Services.Orders
                 shoppingCartItem.AttributesXml = attributesXml;
                 shoppingCartItem.Quantity = newQuantity;
                 shoppingCartItem.UpdatedOnUtc = DateTime.UtcNow;
-
+                shoppingCartItem.SelectedForCheckout = selected ? 1 : 0;
                 _sciRepository.Update(shoppingCartItem);
                 
                 //event notification
@@ -1550,7 +1572,9 @@ namespace Nop.Services.Orders
                     RentalEndDateUtc = rentalEndDate,
                     CreatedOnUtc = now,
                     UpdatedOnUtc = now,
-                    CustomerId = customer.Id
+                    CustomerId = customer.Id,
+                    SelectedForCheckout = selected ? 1 : 0
+
                 };
 
                 _sciRepository.Insert(shoppingCartItem);
@@ -1583,7 +1607,7 @@ namespace Nop.Services.Orders
             int shoppingCartItemId, string attributesXml,
             decimal customerEnteredPrice,
             DateTime? rentalStartDate = null, DateTime? rentalEndDate = null,
-            int quantity = 1, bool resetCheckoutData = true)
+            int quantity = 1, bool resetCheckoutData = true, bool selected = false)
         {
             if (customer == null)
                 throw new ArgumentNullException(nameof(customer));
@@ -1620,7 +1644,7 @@ namespace Nop.Services.Orders
                 shoppingCartItem.RentalStartDateUtc = rentalStartDate;
                 shoppingCartItem.RentalEndDateUtc = rentalEndDate;
                 shoppingCartItem.UpdatedOnUtc = DateTime.UtcNow;
-
+                shoppingCartItem.SelectedForCheckout = selected ? 1 : 0;
                 _sciRepository.Update(shoppingCartItem);
                 _customerService.UpdateCustomer(customer);
 
