@@ -346,7 +346,7 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
                 Order order = new Order();
                 order.OrderGuid = Guid.NewGuid();
                 order.CustomerId = customer.Id;
-                order.PaymentMethodSystemName = "Payments.CheckMoneyOrder";
+                order.PaymentMethodSystemName = "Payments.Eghl";
                 order.StoreId = _storeContext.CurrentStore.Id;
                 _logger.Information("Order prep", null, null);
                 //  var shippingRequired = false;
@@ -431,7 +431,21 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
                 //ordersRootObject.Orders.Add(placedOrderDto);
 
                 //var json = JsonFieldsSerializer.Serialize(ordersRootObject, string.Empty);
+                shoppingcart = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, ShoppingCartType.ShoppingCart, _storeContext.CurrentStore.Id).ToList();
+                _logger.Information("Retrieved cart", null, null);
+                shoppingCartModel = new ShoppingCartModel();
+                shoppingCartModel = _shoppingCartModelFactory.PrepareShoppingCartModel(shoppingCartModel, shoppingcart, true, true, true);
+                foreach (Nop.Web.Models.ShoppingCart.ShoppingCartModel.ShoppingCartItemModel item in shoppingCartModel.Items)
+                {
+                    var cartproduct = _productService.GetProductById(item.ProductId);
+
+                    item.CustomProperties.Add("ProductAttributes", PrepareProductAttributeModels(cartproduct, null));
+
+
+
+                }
                 shoppingCartModel.CustomProperties.Add("paymenturl", paymenturl);
+                shoppingCartModel.CustomProperties.Add("orderguid", order.OrderGuid);
                 return Ok(shoppingCartModel);
             }
             catch (Exception ex)
@@ -489,25 +503,26 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
                     //if the item to update is found, then we ignore the specified "shoppingCartTypeId" parameter
                     updatecartitem.ShoppingCartType;
                 var warnings = _shoppingCartService.GetShoppingCartItemAttributeWarnings(customer, shoppingCartType, product, item.qty, attributesXml);
+                var standardwarnings = _shoppingCartService.GetStandardWarnings(customer, shoppingCartType, product, attributesXml, 0 , item.qty);
+
+                foreach (string warning in warnings)
+                {
+                    addToCartWarnings.Add(warning);
 
 
-                        foreach (string warning in warnings)
+                }
+                foreach (string warning in standardwarnings)
                 {
                     addToCartWarnings.Add(warning);
 
 
                 }
             }
-            if (addToCartWarnings.Count > 0)
-                return BadRequest(addToCartWarnings);
-
-
-
-
-            //if (!_permissionService.Authorize(StandardPermissionProvider.EnableShoppingCart))
-            //    return RedirectToRoute("Homepage");
-                var cart = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, shoppingCartType, _storeContext.CurrentStore.Id).ToList();
-            foreach (ShoppingCartItem item in cart)
+            if (addToCartWarnings.Count == 0)
+            { 
+            
+                var currentcart = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, shoppingCartType, _storeContext.CurrentStore.Id).ToList();
+            foreach (ShoppingCartItem item in currentcart)
             {
                 _shoppingCartService.DeleteShoppingCartItem(item);
             }
@@ -541,17 +556,17 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
 
                 SaveItem(null, addToCartWarnings, product, cartType, attributesXml, 0, null, null, item.qty, item.Selected);
             }
-            if (addToCartWarnings.Count > 0)
-            {
-                
-                return BadRequest(addToCartWarnings);
+                //if (addToCartWarnings.Count > 0)
+                //{
+
+                //    return BadRequest(addToCartWarnings);
+
+            }
 
 
-
-                   
-                    };
+            //        };
             var model = new ShoppingCartModel();
-            cart = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, shoppingCartType, _storeContext.CurrentStore.Id).ToList();
+            var cart = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, shoppingCartType, _storeContext.CurrentStore.Id).ToList();
             model = _shoppingCartModelFactory.PrepareShoppingCartModel(model, cart, true, true, true);
        
 
@@ -567,6 +582,8 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
 
             }
             model.TotalFee = EstimateFee(shoppingCartType);
+            if (model.Warnings.Count == 0)
+                model.Warnings = addToCartWarnings;
             return Ok(model);
 
       
@@ -1247,11 +1264,21 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
                 //ordersRootObject.Orders.Add(placedOrderDto);
 
                 //var json = JsonFieldsSerializer.Serialize(ordersRootObject, string.Empty);
-                 shoppingcart = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, ShoppingCartType.ShoppingCart, _storeContext.CurrentStore.Id).Where(s => s.SelectedForCheckout > 0).ToList();
+                 shoppingcart = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, ShoppingCartType.ShoppingCart, _storeContext.CurrentStore.Id).ToList();
                 _logger.Information("Retrieved cart", null, null);
                  shoppingCartModel = new ShoppingCartModel();
                 shoppingCartModel = _shoppingCartModelFactory.PrepareShoppingCartModel(shoppingCartModel, shoppingcart, true, true, true);
+                foreach (Nop.Web.Models.ShoppingCart.ShoppingCartModel.ShoppingCartItemModel item in shoppingCartModel.Items)
+                {
+                    var cartproduct = _productService.GetProductById(item.ProductId);
+
+                    item.CustomProperties.Add("ProductAttributes", PrepareProductAttributeModels(cartproduct, null));
+
+
+
+                }
                 shoppingCartModel.CustomProperties.Add("paymenturl",paymenturl);
+                shoppingCartModel.CustomProperties.Add("orderguid", order.OrderGuid);
                 return Ok(shoppingCartModel);
             } 
             catch (Exception ex) {
@@ -1266,7 +1293,10 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
             {
                 StoreId = newOrder.StoreId,
                 CustomerId = customer.Id,
-                PaymentMethodSystemName = newOrder.PaymentMethodSystemName
+                PaymentMethodSystemName = newOrder.PaymentMethodSystemName,
+                OrderGuid = newOrder.OrderGuid,
+                OrderGuidGeneratedOnUtc = DateTime.Now
+                
             };
 
             GenerateOrderGuid(processPaymentRequest);
@@ -1280,7 +1310,9 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
             {
                 StoreId = newOrder.StoreId,
                 CustomerId = customer.Id,
-                PaymentMethodSystemName = newOrder.PaymentMethodSystemName
+                PaymentMethodSystemName = newOrder.PaymentMethodSystemName,
+                OrderGuid = newOrder.OrderGuid,
+                OrderGuidGeneratedOnUtc = DateTime.Now
             };
 
             GenerateOrderGuid(processPaymentRequest);

@@ -15,5 +15,7 @@ namespace Nop.Plugin.Misc.WebAPI.DTO
         public string ordernumber { get; set; }
         public string total { get; set; }
         public bool status { get; set; }
+        public string transactionid { get; set; }
+        public string paymentmethod { get; set; }
     }
 }

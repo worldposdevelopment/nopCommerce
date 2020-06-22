@@ -63,8 +63,9 @@ namespace Nop.Plugin.Misc.WebAPI
                     ValidateAudience = false
                 };
             });
+            services.AddHttpClient();
             // services.AddAutoMapper(typeof(Startup));
-           // services.AddScoped<IUserService, UserValidationService>();
+            // services.AddScoped<IUserService, UserValidationService>();
             //services.AddControllers(options =>
             //{
 
@@ -73,7 +74,7 @@ namespace Nop.Plugin.Misc.WebAPI
             //    .Build();
             //    options.Filters.Add(new AuthorizeFilter(policy));
             //});
-           // services.AddControllers();
+            // services.AddControllers();
         }
 
         public void Configure(IApplicationBuilder application)

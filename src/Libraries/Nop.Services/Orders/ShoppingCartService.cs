@@ -616,13 +616,42 @@ namespace Nop.Services.Orders
                 }
             }
 
-            if (!product.AvailableEndDateTimeUtc.HasValue || availableStartDateError)
-                return warnings;
+            if (product.AvailableEndDateTimeUtc.HasValue && !availableStartDateError)
 
-            var availableEndDateTime = DateTime.SpecifyKind(product.AvailableEndDateTimeUtc.Value, DateTimeKind.Utc);
-            if (availableEndDateTime.CompareTo(DateTime.UtcNow) < 0)
+             {
+
+                var availableEndDateTime = DateTime.SpecifyKind(product.AvailableEndDateTimeUtc.Value, DateTimeKind.Utc);
+                if (availableEndDateTime.CompareTo(DateTime.UtcNow) < 0)
+                {
+                    warnings.Add(_localizationService.GetResource("ShoppingCart.NotAvailable"));
+                }
+            }
+
+            if (product.IsPrelaunch)
             {
-                warnings.Add(_localizationService.GetResource("ShoppingCart.NotAvailable"));
+                var prelaunchError = false;
+
+                if (product.PrelaunchStartDateTime.HasValue)
+                {
+                    var prelaunchStartDateTime = DateTime.SpecifyKind(product.PrelaunchStartDateTime.Value, DateTimeKind.Local);
+                    if (prelaunchStartDateTime.CompareTo(DateTime.Now) > 0)
+                    {
+                        warnings.Add(_localizationService.GetResource("ShoppingCart.NotAvailable"));
+                        prelaunchError = true;
+                    }
+                }
+
+                if (!product.PrelaunchEndDateTime.HasValue || prelaunchError)
+                    return warnings;
+
+                var prelaunchEndDateTime = DateTime.SpecifyKind(product.PrelaunchEndDateTime.Value, DateTimeKind.Local);
+                if (prelaunchEndDateTime.CompareTo(DateTime.Now) < 0)
+                {
+                    warnings.Add(_localizationService.GetResource("ShoppingCart.NotAvailable"));
+                }
+
+
+
             }
 
             return warnings;
@@ -935,7 +964,7 @@ namespace Nop.Services.Orders
 
             //validate for virtual gift cards only
             if (string.IsNullOrEmpty(giftCardSenderEmail) || !CommonHelper.IsValidEmail(giftCardSenderEmail))
-                warnings.Add(_localizationService.GetResource("ShoppingCart.SenderEmailError"));
+                warnings.Add(_localizationService.GetResource("ShopprelaunchpingCart.SenderEmailError"));
 
             return warnings;
         }

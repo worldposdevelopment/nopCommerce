@@ -48,7 +48,8 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
         private readonly IStoreContext _storeContext;
         private readonly ILogger _logger;
         private readonly IShoppingCartService _shoppingCartService;
-        public CatalogController(ICategoryService categoryService, IProductService productService, ICatalogModelFactory catalogModelFactory, IProductModelFactory productModelFactory, IVendorService vendorService, ICustomerService customerService, IWorkContext workContext, CatalogSettings catalogSettings, IReviewTypeService reviewTypeService, ILocalizationService localizationService, IOrderService orderService, IStoreContext storeContext, LocalizationSettings localizationSettings, ICustomerActivityService customerActivityService, ILogger logger, IShoppingCartService shoppingCartService)
+        private readonly IManufacturerService _manufacturerService;
+        public CatalogController(ICategoryService categoryService, IProductService productService, ICatalogModelFactory catalogModelFactory, IProductModelFactory productModelFactory, IVendorService vendorService, ICustomerService customerService, IWorkContext workContext, CatalogSettings catalogSettings, IReviewTypeService reviewTypeService, ILocalizationService localizationService, IOrderService orderService, IStoreContext storeContext, LocalizationSettings localizationSettings, ICustomerActivityService customerActivityService, ILogger logger, IShoppingCartService shoppingCartService, IManufacturerService manufacturerService)
         {
             _catalogModelFactory = catalogModelFactory;
             _categoryService = categoryService;
@@ -66,9 +67,24 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
             _customerActivityService = customerActivityService;
             _logger = logger;
             _shoppingCartService = shoppingCartService;
+            _manufacturerService =  manufacturerService;
 
         }
 
+        [HttpGet("api/getmanufacturerproducts")]
+        public IActionResult GetManufacturer(int manufacturerid, CatalogPagingFilteringModel command, string mobileno)
+        {
+
+            var customer = _customerService.GetCustomerByUsername(mobileno);
+            _workContext.CurrentCustomer = customer;
+
+            var manufacturer = _manufacturerService.GetManufacturerById(manufacturerid);
+            var model = _catalogModelFactory.PrepareManufacturerModel(manufacturer, command);
+
+            //template
+            //  var templateViewPath = _catalogModelFactory.PrepareCategoryTemplateViewPath(category.CategoryTemplateId);
+            return Ok(model);
+        }
         [HttpGet("api/getallproducts")]
         public IActionResult GetVendor(int categoryId, CatalogPagingFilteringModel command, string mobileno)
         {
@@ -139,6 +155,7 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
 
                 var product = _productService.GetProductById(productId);
             var model = _productModelFactory.PrepareProductDetailsModel(product, null, false);
+            //var stockAvailability = _productService.FormatStockMessage(product, attributeXml);
 
             //template
             //  var templateViewPath = _catalogModelFactory.PrepareCategoryTemplateViewPath(category.CategoryTemplateId);

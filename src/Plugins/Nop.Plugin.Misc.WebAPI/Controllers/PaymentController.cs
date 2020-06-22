@@ -8,6 +8,7 @@ using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Media;
 using Nop.Core.Domain.Messages;
 using Nop.Core.Domain.Orders;
+using Nop.Core.Domain.Payments;
 using Nop.Plugin.Misc.WebAPI.DTO;
 using Nop.Services.Catalog;
 using Nop.Services.Customers;
@@ -56,8 +57,41 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
             var model = _orderModelFactory.PrepareCustomerOrderListModel();
             return View(model);
         }
+        [HttpGet("api/paymentcallback")]
+        public IActionResult PaymentCallback(string mobilenumber, string orderguid)
+        {
+            var customer = _customerService.GetCustomerByUsername(mobilenumber);
+            _workContext.CurrentCustomer = customer;
+            var order = _orderService.GetOrderByGuid(new Guid(orderguid));
+            //var order = _orderService.getorder
+            if (order.PaymentStatus == PaymentStatus.Paid)
+            {
+              
+                return Ok(new PaymentDetailsDTO { ordernumber = order.CustomOrderNumber, total = _priceFormatter.FormatPrice(order.OrderTotal), mobileno = customer.Username, status = true, transactionid = order.CaptureTransactionId, paymentmethod = order.CardType });
+            }
+          else
+            { 
+                if(order.OrderStatus == OrderStatus.Pending)
+                { 
+                _orderService.InsertOrderNote(new OrderNote
+                {
+                    OrderId = order.Id,
+                    Note = "Payment Exited: ",
+                    DisplayToCustomer = false,
+                    CreatedOnUtc = DateTime.UtcNow
+                });
+               
+                _orderService.UpdateOrder(order);
+            _orderProcessingService.CancelOrder(order, false);
+                }
+
+                return Ok(new PaymentDetailsDTO { ordernumber = order.CustomOrderNumber, total = _priceFormatter.FormatPrice(order.OrderTotal), mobileno = customer.Username, status = false, transactionid = order.CaptureTransactionId, paymentmethod = order.CardType });
+            }
+          
+
+        }
         [HttpGet("api/paymentstatus")]
-        public IActionResult PaymentStaus(bool success, string ordernumber, string authcode)
+        public IActionResult SetPaymentStatus(bool success, string ordernumber, string authcode, string transactionid, string paymentmethod)
         {
           
             if (success)
@@ -108,6 +142,8 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
 
                 //mark order as paid
                 order.AuthorizationTransactionId = authcode;
+                order.CaptureTransactionId = transactionid;
+                order.CardType = paymentmethod;
                 _orderService.UpdateOrder(order);
                 _orderProcessingService.MarkOrderAsPaid(order);
                 return Ok(new PaymentDetailsDTO { ordernumber = ordernumber, total = _priceFormatter.FormatPrice(order.OrderTotal), mobileno = customer.Username, status = true });
@@ -142,7 +178,9 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
                     CreatedOnUtc = DateTime.UtcNow
                 });
                 order.AuthorizationTransactionId = authcode;
+                order.CaptureTransactionId = transactionid;
                 _orderService.UpdateOrder(order);
+                order.CardType = paymentmethod;
                 _orderProcessingService.CancelOrder(order, false);
               
                 return Ok(new PaymentDetailsDTO { ordernumber = ordernumber, total = _priceFormatter.FormatPrice(order.OrderTotal), mobileno = customer.Username, status = false });
