@@ -15,7 +15,7 @@
                 ? url.ToString()
                 : webHelper.GetRawUrl(Context.Request);
 
-            <li><a href="@Url.RouteUrl("Register", new { returnUrl })" class="ico-register">@T("Account.Register")</a></li>
+            @*<li><a href="@Url.RouteUrl("Register", new { returnUrl })" class="ico-register">@T("Account.Register")</a></li>*@
             <li><a href="@Url.RouteUrl("Login", new { returnUrl })" class="ico-login">@T("Account.Login")</a></li>
         }
         @if (Model.AllowPrivateMessages)
@@ -29,21 +29,21 @@
         }
         @if (Model.WishlistEnabled)
         {
-            <li>
+            @*<li>
                 <a href="@Url.RouteUrl("Wishlist")" class="ico-wishlist">
                     <span class="wishlist-label">@T("Wishlist")</span>
                     <span class="wishlist-qty">@T("Wishlist.HeaderQuantity", Model.WishlistItems)</span>
                 </a>
-            </li>
+            </li>*@
         }
         @if (Model.ShoppingCartEnabled)
         {
-            <li id="topcartlink">
+            @*<li id="topcartlink">
                 <a href="@Url.RouteUrl("ShoppingCart")" class="ico-cart">
                     <span class="cart-label">@T("ShoppingCart")</span>
                     <span class="cart-qty">@T("ShoppingCart.HeaderQuantity", Model.ShoppingCartItems)</span>
                 </a>
-            </li>
+            </li>*@
         }
         @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.HeaderLinksAfter })
     </ul>
@@ -58,7 +58,7 @@
     }
     @if (Model.ShoppingCartEnabled)
     {
-        <script asp-location="Footer">
+        @*<script asp-location="Footer">
             $(document).ready(function () {
                 $('.header').on('mouseenter', '#topcartlink', function () {
                     $('#flyout-cart').addClass('active');
@@ -73,6 +73,6 @@
                     $('#flyout-cart').removeClass('active');
                 });
             });
-        </script>
+        </script>*@
     }
 </div>

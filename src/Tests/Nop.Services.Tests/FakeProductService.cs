@@ -41,6 +41,7 @@ namespace Nop.Services.Tests
             IRepository<Product> productRepository = null,
             IRepository<ProductAttributeCombination> productAttributeCombinationRepository = null,
             IRepository<ProductAttributeMapping> productAttributeMappingRepository = null,
+           IRepository<ProductAttributeValue> productAttributeValueRepository = null,
             IRepository<ProductCategory> productCategoryRepository = null,
             IRepository<ProductPicture> productPictureRepository = null,
             IRepository<ProductReview> productReviewRepository = null,
@@ -74,7 +75,9 @@ namespace Nop.Services.Tests
                 discountProductMappingRepository.FakeRepoNullPropagation(),
                 productRepository.FakeRepoNullPropagation(),
                 productAttributeCombinationRepository.FakeRepoNullPropagation(),
+                          productAttributeValueRepository.FakeRepoNullPropagation(),
                 productAttributeMappingRepository.FakeRepoNullPropagation(),
+      
                 productCategoryRepository.FakeRepoNullPropagation(),
                 productPictureRepository.FakeRepoNullPropagation(),
                 productReviewRepository.FakeRepoNullPropagation(),

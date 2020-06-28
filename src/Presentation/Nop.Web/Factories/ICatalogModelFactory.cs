@@ -38,6 +38,7 @@ namespace Nop.Web.Factories
         #endregion
 
         #region Categories
+        SearchModel PrepareSearchByAttributeValueNameModel(SearchModel model, CatalogPagingFilteringModel command, string name);
 
         /// <summary>
         /// Prepare category model

@@ -98,8 +98,8 @@ namespace Nop.Services.Tests.Catalog
             var shipmentRepository = new Mock<IRepository<Shipment>>();
 
             _productService = new ProductService(new CatalogSettings(), new CommonSettings(), null, new FakeCacheKeyService(),  _customerService,
-                null, null, null, null, null, null, null, null, null, _discountProductMappingRepository.Object,
-                _productRepository.Object, null, null, null, null, null, null, null, null, shipmentRepository.Object,
+                null, null, null, null, null, null, null,null, null, _discountProductMappingRepository.Object,
+                _productRepository.Object, null, null, null, null, null, null, null, null, null, shipmentRepository.Object,
                 null, null, _tierPriceRepository.Object, null,
                 null, null, null, null, new LocalizationSettings());
 

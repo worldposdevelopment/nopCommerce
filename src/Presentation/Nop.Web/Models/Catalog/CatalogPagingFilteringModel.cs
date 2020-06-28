@@ -76,6 +76,7 @@ namespace Nop.Web.Models.Catalog
         /// Available page size options
         /// </summary>
         public IList<SelectListItem> PageSizeOptions { get; set; }
+        public IList<String> SizeOptions { get; set; }
 
         /// <summary>
         /// Order by
@@ -86,6 +87,7 @@ namespace Nop.Web.Models.Catalog
         /// Product sorting
         /// </summary>
         public string ViewMode { get; set; }
+        public string Size { get; set; }
 
         #endregion
 

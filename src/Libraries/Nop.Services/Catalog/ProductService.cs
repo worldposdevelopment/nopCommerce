@@ -49,6 +49,7 @@ namespace Nop.Services.Catalog
         protected readonly IRepository<CrossSellProduct> _crossSellProductRepository;
         protected readonly IRepository<DiscountProductMapping> _discountProductMappingRepository;
         protected readonly IRepository<Product> _productRepository;
+        protected readonly IRepository<ProductAttributeValue> _productAttributeValueRepository;
         protected readonly IRepository<ProductAttributeCombination> _productAttributeCombinationRepository;
         protected readonly IRepository<ProductAttributeMapping> _productAttributeMappingRepository;
         protected readonly IRepository<ProductCategory> _productCategoryRepository;
@@ -89,6 +90,7 @@ namespace Nop.Services.Catalog
             IRepository<DiscountProductMapping> discountProductMappingRepository,
             IRepository<Product> productRepository,
             IRepository<ProductAttributeCombination> productAttributeCombinationRepository,
+            IRepository<ProductAttributeValue> productAttributeValueRepository,
             IRepository<ProductAttributeMapping> productAttributeMappingRepository,
             IRepository<ProductCategory> productCategoryRepository,
             IRepository<ProductPicture> productPictureRepository,
@@ -125,6 +127,7 @@ namespace Nop.Services.Catalog
             _productRepository = productRepository;
             _productAttributeCombinationRepository = productAttributeCombinationRepository;
             _productAttributeMappingRepository = productAttributeMappingRepository;
+            _productAttributeValueRepository = productAttributeValueRepository;
             _productCategoryRepository = productCategoryRepository;
             _productPictureRepository = productPictureRepository;
             _productReviewRepository = productReviewRepository;
@@ -565,6 +568,7 @@ namespace Nop.Services.Catalog
             bool visibleIndividuallyOnly = false,
             bool markedAsNewOnly = false,
             bool? featuredProducts = null,
+             string size = null,
             decimal? priceMin = null,
             decimal? priceMax = null,
             int productTagId = 0,
@@ -577,12 +581,13 @@ namespace Nop.Services.Catalog
             IList<int> filteredSpecs = null,
             ProductSortingEnum orderBy = ProductSortingEnum.Position,
             bool showHidden = false,
-            bool? overridePublished = null)
+            bool? overridePublished = null
+           )
         {
             return SearchProducts(out var _, false,
                 pageIndex, pageSize, categoryIds, manufacturerId,
                 storeId, vendorId, warehouseId,
-                productType, visibleIndividuallyOnly, markedAsNewOnly, featuredProducts,
+                productType, visibleIndividuallyOnly, markedAsNewOnly, featuredProducts, size,
                 priceMin, priceMax, productTagId, keywords, searchDescriptions, searchManufacturerPartNumber, searchSku,
                 searchProductTags, languageId, filteredSpecs,
                 orderBy, showHidden, overridePublished);
@@ -636,6 +641,7 @@ namespace Nop.Services.Catalog
             bool visibleIndividuallyOnly = false,
             bool markedAsNewOnly = false,
             bool? featuredProducts = null,
+             string size = null,
             decimal? priceMin = null,
             decimal? priceMax = null,
             int productTagId = 0,
@@ -648,7 +654,8 @@ namespace Nop.Services.Catalog
             IList<int> filteredSpecs = null,
             ProductSortingEnum orderBy = ProductSortingEnum.Position,
             bool showHidden = false,
-            bool? overridePublished = null)
+            bool? overridePublished = null
+           )
         {
             filterableSpecificationAttributeOptionIds = new List<int>();
 
@@ -722,6 +729,7 @@ namespace Nop.Services.Catalog
             var pShowHidden = SqlParameterHelper.GetBooleanParameter("ShowHidden", showHidden);
             var pOverridePublished = SqlParameterHelper.GetBooleanParameter("OverridePublished", overridePublished);
             var pLoadFilterableSpecificationAttributeOptionIds = SqlParameterHelper.GetBooleanParameter("LoadFilterableSpecificationAttributeOptionIds", loadFilterableSpecificationAttributeOptionIds);
+            var pSize = SqlParameterHelper.GetStringParameter("SizeKeywords", size);
 
             //prepare output parameters
             var pFilterableSpecificationAttributeOptionIds = SqlParameterHelper.GetOutputStringParameter("FilterableSpecificationAttributeOptionIds");
@@ -759,7 +767,7 @@ namespace Nop.Services.Catalog
                 pOverridePublished,
                 pLoadFilterableSpecificationAttributeOptionIds,
                 pFilterableSpecificationAttributeOptionIds,
-                pTotalRecords).ToList();
+                pTotalRecords, pSize).ToList();
 
             //get filterable specification attribute option identifier
             var filterableSpecificationAttributeOptionIdsStr =
@@ -801,6 +809,33 @@ namespace Nop.Services.Catalog
 
             return new PagedList<Product>(query, pageIndex, pageSize);
         }
+
+        public virtual IPagedList<Product> GetProductsByProductAtributeValueName(string name,
+     int pageIndex = 0, int pageSize = int.MaxValue)
+        {
+            var query = from p in _productRepository.Table
+                        join pam in _productAttributeMappingRepository.Table on p.Id equals pam.ProductId 
+                        join pav in _productAttributeValueRepository.Table on pam.Id equals pav.ProductAttributeMappingId
+                        where
+                            pav.Name == name &&
+                            !p.Deleted && !p.Published && p.VisibleIndividually
+
+                        orderby p.Name
+                        select p;
+
+            return new PagedList<Product>(query, pageIndex, pageSize);
+        }
+
+        public virtual IList<String> GetProductAtributeValueNames()
+        {
+            var query = from pav in _productAttributeValueRepository.Table 
+                        orderby pav.Name
+                        select pav.Name;
+
+            return query.Distinct().ToList();
+        }
+
+
 
         /// <summary>
         /// Gets associated products

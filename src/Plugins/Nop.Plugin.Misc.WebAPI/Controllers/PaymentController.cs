@@ -10,6 +10,7 @@ using Nop.Core.Domain.Messages;
 using Nop.Core.Domain.Orders;
 using Nop.Core.Domain.Payments;
 using Nop.Plugin.Misc.WebAPI.DTO;
+using Nop.Plugin.Misc.WebAPI.Filter;
 using Nop.Services.Catalog;
 using Nop.Services.Customers;
 using Nop.Services.Localization;
@@ -25,7 +26,10 @@ using Nop.Web.Models.Media;
 
 namespace Nop.Plugin.Misc.WebAPI.Controllers
 {
-    public class PaymentContoller : BasePublicController
+    [ApiKeyAuth]
+    [Route("")]
+    [ApiController]
+    public class PaymentContoller : ControllerBase
     {
         private readonly ICustomerService _customerService;
         private readonly IWorkContext _workContext;
@@ -50,13 +54,7 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
             _localizationService = localizationService;
             _priceFormatter = priceFormatter;
     }
-        // GET: /<controller>/
-        public IActionResult Index()
-        {
-
-            var model = _orderModelFactory.PrepareCustomerOrderListModel();
-            return View(model);
-        }
+ 
         [HttpGet("api/paymentcallback")]
         public IActionResult PaymentCallback(string mobilenumber, string orderguid)
         {

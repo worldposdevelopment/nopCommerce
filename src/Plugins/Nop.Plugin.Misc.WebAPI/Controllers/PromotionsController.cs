@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Nop.Plugin.Misc.WebAPI.Filter;
 using Nop.Plugin.Misc.WebAPI.Models.Promotions;
 using Nop.Services.Catalog;
 using Nop.Web.Factories;
@@ -13,8 +14,10 @@ using Nop.Web.Models.Catalog;
 
 namespace Nop.Plugin.Misc.WebAPI.Controllers
 {
-  
-    public class PromotionsController : Controller
+    [ApiKeyAuth]
+    [Route("")]
+    [ApiController]
+    public class PromotionsController : ControllerBase
     {
         private readonly ICatalogModelFactory _catalogModelFactory;
         private readonly ICategoryService _categoryService;

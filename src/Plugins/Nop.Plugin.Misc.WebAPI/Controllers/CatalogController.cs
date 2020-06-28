@@ -9,6 +9,7 @@ using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Localization;
 using Nop.Core.Domain.Orders;
 using Nop.Plugin.Misc.WebAPI.DTO;
+using Nop.Plugin.Misc.WebAPI.Filter;
 using Nop.Services.Catalog;
 using Nop.Services.Customers;
 using Nop.Services.Events;
@@ -26,7 +27,10 @@ using StackExchange.Profiling.Internal;
 
 namespace Nop.Plugin.Misc.WebAPI.Controllers
 {
-    public class CatalogController : BasePublicController
+    [ApiKeyAuth]
+    [Route("")]
+    [ApiController]
+    public class CatalogController : ControllerBase
     {
 
  
@@ -72,7 +76,7 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
         }
 
         [HttpGet("api/getmanufacturerproducts")]
-        public IActionResult GetManufacturer(int manufacturerid, CatalogPagingFilteringModel command, string mobileno)
+        public IActionResult GetManufacturer(int manufacturerid, [FromQuery]CatalogPagingFilteringModel command, string mobileno)
         {
 
             var customer = _customerService.GetCustomerByUsername(mobileno);
@@ -85,8 +89,23 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
             //  var templateViewPath = _catalogModelFactory.PrepareCategoryTemplateViewPath(category.CategoryTemplateId);
             return Ok(model);
         }
+        [HttpGet("api/getpromoproducts")]
+        public IActionResult GetPromoProducts([FromQuery]CatalogPagingFilteringModel command, string mobileno)
+        {
+
+            var customer = _customerService.GetCustomerByUsername(mobileno);
+            _workContext.CurrentCustomer = customer;
+
+            var vendor = _vendorService.GetVendorById(1);
+            var model = _catalogModelFactory.PrepareVendorModel(vendor, command);
+            model.Products = model.Products.Where(a => a.ProductPrice.OldPrice != null && a.ProductPrice.OldPrice != a.ProductPrice.Price).ToList();
+
+            //template
+            //  var templateViewPath = _catalogModelFactory.PrepareCategoryTemplateViewPath(category.CategoryTemplateId);
+            return Ok(model);
+        }
         [HttpGet("api/getallproducts")]
-        public IActionResult GetVendor(int categoryId, CatalogPagingFilteringModel command, string mobileno)
+        public IActionResult GetVendor(int categoryId, [FromQuery] CatalogPagingFilteringModel command, string mobileno)
         {
 
             var customer = _customerService.GetCustomerByUsername(mobileno);
@@ -100,7 +119,7 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
             return Ok(model);
         }
         [HttpGet("api/getcatalog")]
-        public  IActionResult GetCatalog(int categoryId, CatalogPagingFilteringModel command,string mobileno)
+        public  IActionResult GetCatalog(int categoryId, [FromQuery]CatalogPagingFilteringModel command,string mobileno)
         {
           
 
@@ -109,7 +128,7 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
 
             var category = _categoryService.GetCategoryById(categoryId);
             if (category == null || category.Deleted)
-                return InvokeHttp404();
+                return BadRequest();
 
             //var notAvailable =
             //    //published?
@@ -140,7 +159,7 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
 
             //model
             var model = _catalogModelFactory.PrepareCategoryModel(category, command);
-            _logger.Information("GetCatalogReturn: "+model.ToJson(), null, null);
+            //_logger.Information("GetCatalogReturn: "+model.ToJson(), null, null);
 
             //template
             //  var templateViewPath = _catalogModelFactory.PrepareCategoryTemplateViewPath(category.CategoryTemplateId);
@@ -164,8 +183,26 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
                 model.InWishlist = true;
             return Ok(model);
         }
+        //[HttpGet("api/filtersize")]
+        //public virtual IActionResult Filterbysize(SearchModel model, CatalogPagingFilteringModel command, string name, string mobileno)
+        //{
+
+        //    var customer = _customerService.GetCustomerByUsername(mobileno);
+        //    _workContext.CurrentCustomer = customer;
+        //    //'Continue shopping' URL
+        //    //_genericAttributeService.SaveAttribute(_workContext.CurrentCustomer,
+        //    //    NopCustomerDefaults.LastContinueShoppingPageAttribute,
+        //    //    _webHelper.GetThisPageUrl(true),
+        //    //    _storeContext.CurrentStore.Id);
+
+        //    if (model == null)
+        //        model = new SearchModel();
+
+        //    model = _catalogModelFactory.PrepareSearchByAttributeValueNameModel(model, command, name);
+        //    return Ok(model);
+        //}
         [HttpGet("api/searchproducts")]
-        public virtual IActionResult Search(SearchModel model, CatalogPagingFilteringModel command, string mobileno)
+        public virtual IActionResult Search([FromQuery]SearchModel model, [FromQuery]CatalogPagingFilteringModel command, string mobileno)
         {
 
             var customer = _customerService.GetCustomerByUsername(mobileno);

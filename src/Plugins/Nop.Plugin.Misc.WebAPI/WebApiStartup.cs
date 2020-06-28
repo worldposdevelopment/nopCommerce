@@ -21,6 +21,8 @@ using AutoMapper;
 using Microsoft.OpenApi.Models;
 using Nop.Core.Infrastructure;
 using Nop.Web.Framework.Infrastructure;
+using Nop.Plugin.Misc.WebAPI.Filter;
+using Nop.Plugin.Misc.WebAPI.Helper;
 
 namespace Nop.Plugin.Misc.WebAPI
 {
@@ -43,26 +45,27 @@ namespace Nop.Plugin.Misc.WebAPI
             //     services.AddDbContext<DataContext>(options => options.UseSqlServer(Configuration["ConnectionStrings:hoopsstationDB"])); ;
 
             services.AddSwaggerGen(c => {
-               c.SwaggerDoc("v1", new OpenApiInfo { Title = "Hoopsstation API", Version = "v1" });
-
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Hoops API", Version = "v1" });
+                c.OperationFilter<ApiKeyHeaderFilter>();
             });
-          //  services.AddIdentity<User, Role>().AddEntityFrameworkStores<DataContext>().AddDefaultTokenProviders().AddRoleValidator<RoleValidator<Role>>().AddRoleManager<RoleManager<Role>>().AddSignInManager<SignInManager<User>>();
+            //  services.AddIdentity<User, Role>().AddEntityFrameworkStores<DataContext>().AddDefaultTokenProviders().AddRoleValidator<RoleValidator<Role>>().AddRoleManager<RoleManager<Role>>().AddSignInManager<SignInManager<User>>();
 
-            var key = Encoding.ASCII.GetBytes("TestJWT");
-            services.AddAuthentication(x => {
-                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(x => {
-                x.RequireHttpsMetadata = false;
-                x.SaveToken = true;
-                x.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ValidateIssuer = false,
-                    ValidateAudience = false
-                };
-            });
+            //var key = Encoding.ASCII.GetBytes("TestJWT");
+            //services.AddAuthentication(x => {
+            //    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            //    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            //}).AddJwtBearer(x => {
+            //    x.RequireHttpsMetadata = false;
+            //    x.SaveToken = true;
+            //    x.TokenValidationParameters = new TokenValidationParameters
+            //    {
+            //        ValidateIssuerSigningKey = true,
+            //        IssuerSigningKey = new SymmetricSecurityKey(key),
+            //        ValidateIssuer = false,
+            //        ValidateAudience = false
+            //    };
+            //});
+            services.AddScoped<ApiKeyAuthAttribute>();
             services.AddHttpClient();
             // services.AddAutoMapper(typeof(Startup));
             // services.AddScoped<IUserService, UserValidationService>();

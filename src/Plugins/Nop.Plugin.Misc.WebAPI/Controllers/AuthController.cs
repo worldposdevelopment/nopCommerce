@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Nop.Core.Domain.Customers;
 using Nop.Plugin.Misc.WebAPI.DTO;
+using Nop.Plugin.Misc.WebAPI.Filter;
 using Nop.Plugin.Misc.WebAPI.Services;
 using Nop.Services.Common;
 using Nop.Services.Customers;
@@ -17,7 +18,10 @@ using StackExchange.Profiling.Internal;
 
 namespace Nop.Plugin.Misc.WebAPI.Controllers
 {
-    public class AuthController : Controller
+    [ApiKeyAuth]
+    [Route("")]
+    [ApiController]
+    public class AuthController : ControllerBase
     {
         private readonly ICustomerRegistrationService _customerRegistrationService;
         private readonly CustomerSettings _customerSettings;

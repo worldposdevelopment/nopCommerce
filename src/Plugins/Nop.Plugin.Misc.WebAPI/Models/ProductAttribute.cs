@@ -11,5 +11,6 @@ namespace Nop.Plugin.Misc.WebAPI.Models
         public string ProductAttributeId { get; set; }
         public string ProductAttributeValue { get; set; }
         public Boolean Selected { get; set; }
+           public Boolean HasWarning { get; set; }
     }
 }

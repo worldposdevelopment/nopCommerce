@@ -15,6 +15,7 @@ using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Orders;
 using Nop.Core.Domain.Payments;
 using Nop.Core.Domain.Shipping;
+using Nop.Plugin.Misc.WebAPI.Filter;
 using Nop.Plugin.Misc.WebAPI.Models;
 using Nop.Services.Catalog;
 using Nop.Services.Common;
@@ -35,8 +36,10 @@ using StackExchange.Profiling.Internal;
 
 namespace Nop.Plugin.Misc.WebAPI.Controllers
 {
-
-    public class CartController : BasePublicController
+    [ApiKeyAuth]
+    [Route("")]
+    [ApiController]
+    public class CartController : ControllerBase
     {
 
         private readonly ICustomerService _customerService;
@@ -444,6 +447,146 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
 
 
                 }
+                shoppingCartModel.CustomProperties.Add("paymenturl", "https://qr.worldgroup.asia/login");
+                shoppingCartModel.CustomProperties.Add("orderguid", order.OrderGuid);
+                return Ok(shoppingCartModel);
+            }
+            catch (Exception ex)
+            {
+                _logger.Information("Checkout failed", ex, null);
+                return Ok();
+            }
+
+        }
+        [HttpPost("api/offlinerafflecheckout")]
+        public IActionResult OfflineRaffleCreateOrder(string mobileno, int addressid)
+        {
+            if (mobileno != null)
+                _logger.Information(mobileno + ": at checkout", null, null);
+            else
+                _logger.Information("Null mobile at checkout", null, null);
+            try
+            {
+                var customer = _customerService.GetCustomerByUsername(mobileno);
+                _workContext.CurrentCustomer = customer;
+
+
+                if (addressid > 0)
+                {
+                    var pickupPoints = _shippingService.GetPickupPoints(_workContext.CurrentCustomer.BillingAddressId ?? 0,
+                   _workContext.CurrentCustomer, "Pickup.PickupInStore", _storeContext.CurrentStore.Id).PickupPoints.ToList();
+                    var selectedPoint = pickupPoints.FirstOrDefault(x => x.Id.Equals(addressid.ToString()));
+                    SavePickupOption(selectedPoint);
+                }
+
+
+                var shoppingcart = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, ShoppingCartType.OfflineRaffles, _storeContext.CurrentStore.Id);
+                _logger.Information("Retrieved cart", null, null);
+                var shoppingCartModel = new ShoppingCartModel();
+                shoppingCartModel = _shoppingCartModelFactory.PrepareShoppingCartModel(shoppingCartModel, shoppingcart, true, true, true);
+                // We doesn't have to check for value because this is done by the order validator.
+
+                Order order = new Order();
+                order.OrderGuid = Guid.NewGuid();
+                order.CustomerId = customer.Id;
+                order.PaymentMethodSystemName = "Payments.Eghl";
+                order.StoreId = _storeContext.CurrentStore.Id;
+                _logger.Information("Order prep", null, null);
+                //  var shippingRequired = false;
+
+                //if (orderDelta.Dto.OrderItems != null)
+                //{
+                //    var shouldReturnError = AddOrderItemsToCart(orderDelta.Dto.OrderItems, customer, orderDelta.Dto.StoreId ?? _storeContext.CurrentStore.Id);
+                //    if (shouldReturnError)
+                //    {
+                //        return Error(HttpStatusCode.BadRequest);
+                //    }
+                Boolean isValid = true;
+                //if (order.PickupInStore == false)
+                //{
+                //    isValid = SetShippingOption("Shipping.FixedByWeightByTotal",
+                //                               "Hoops Station Shipping",
+                //                              _storeContext.CurrentStore.Id,
+                //                               customer,
+                //                              _shoppingCartService.GetShoppingCart(customer, ShoppingCartType.OfflineRaffles).ToList(), _customerService.GetCustomerShippingAddress(customer));
+                //}
+                //}
+
+                //if (shippingRequired)
+                //{
+                //    var isValid = true;
+
+
+
+                //if (!isValid)
+                //{
+                //    return BadRequest();
+                //}
+                //}
+
+
+
+
+                //customer.BillingAddress = newOrder.BillingAddress;
+                //customer.ShippingAddress = newOrder.ShippingAddress;
+
+                // If the customer has something in the cart it will be added too. Should we clear the cart first? 
+                order.CustomerId = customer.Id;
+
+                // The default value will be the currentStore.id, but if it isn't passed in the json we need to set it by hand.
+                //if (!orderDelta.Dto.StoreId.HasValue)
+                //{
+                //    newOrder.StoreId = _storeContext.CurrentStore.Id;
+                //}
+                _logger.Information("Before placing order", null, null);
+                var placeOrderResult = PlaceOrderOfflineRaffle(order, customer);
+
+                if (!placeOrderResult.Success)
+                {
+                    foreach (var error in placeOrderResult.Errors)
+                    {
+                        ModelState.AddModelError("order placement", error);
+                    }
+
+                    return BadRequest();
+                }
+
+                _customerActivityService.InsertActivity("AddNewOrder",
+                    _localizationService.GetResource("ActivityLog.AddNewOrder"), order);
+                var postProcessPaymentRequest = new PostProcessPaymentRequest
+                {
+                    Order = order
+                };
+
+                //var ordersRootObject = new OrdersRootObject();
+
+                //var placedOrderDto = _dtoHelper.PrepareOrderDTO(placeOrderResult.PlacedOrder);
+
+                //ordersRootObject.Orders.Add(placedOrderDto);
+
+                //var json = JsonFieldsSerializer.Serialize(ordersRootObject, string.Empty);
+                _paymentService.PostProcessPayment(postProcessPaymentRequest);
+                string paymenturl = ProcessPaymentRequest();
+                //var ordersRootObject = new OrdersRootObject();
+
+                //var placedOrderDto = _dtoHelper.PrepareOrderDTO(placeOrderResult.PlacedOrder);
+
+                //ordersRootObject.Orders.Add(placedOrderDto);
+
+                //var json = JsonFieldsSerializer.Serialize(ordersRootObject, string.Empty);
+                shoppingcart = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, ShoppingCartType.ShoppingCart, _storeContext.CurrentStore.Id).ToList();
+                _logger.Information("Retrieved cart", null, null);
+                shoppingCartModel = new ShoppingCartModel();
+                shoppingCartModel = _shoppingCartModelFactory.PrepareShoppingCartModel(shoppingCartModel, shoppingcart, true, true, true);
+                foreach (Nop.Web.Models.ShoppingCart.ShoppingCartModel.ShoppingCartItemModel item in shoppingCartModel.Items)
+                {
+                    var cartproduct = _productService.GetProductById(item.ProductId);
+
+                    item.CustomProperties.Add("ProductAttributes", PrepareProductAttributeModels(cartproduct, null));
+
+
+
+                }
                 shoppingCartModel.CustomProperties.Add("paymenturl", paymenturl);
                 shoppingCartModel.CustomProperties.Add("orderguid", order.OrderGuid);
                 return Ok(shoppingCartModel);
@@ -455,7 +598,6 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
             }
 
         }
-
         [HttpPost("api/updatecart")]
         public IActionResult UpdateCart([FromBody] IList<ProductAttributeMobile> products, string mobileno, int shoppingCartTypeId = 1)
         {
@@ -467,6 +609,7 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
             var shoppingCartType = (ShoppingCartType)shoppingCartTypeId;
             ShoppingCartItem updatecartitem = null;
             _workContext.CurrentCustomer = customer;
+          
 
             if (String.IsNullOrEmpty(mobileno))
             {
@@ -504,7 +647,8 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
                     updatecartitem.ShoppingCartType;
                 var warnings = _shoppingCartService.GetShoppingCartItemAttributeWarnings(customer, shoppingCartType, product, item.qty, attributesXml);
                 var standardwarnings = _shoppingCartService.GetStandardWarnings(customer, shoppingCartType, product, attributesXml, 0 , item.qty);
-
+                if (warnings.Count > 0 || standardwarnings.Count > 0)
+                    item.HasWarning = true;
                 foreach (string warning in warnings)
                 {
                     addToCartWarnings.Add(warning);
@@ -518,15 +662,15 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
 
                 }
             }
-            if (addToCartWarnings.Count == 0)
-            { 
+            //if (addToCartWarnings.Count == 0)
+            //{ 
             
                 var currentcart = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, shoppingCartType, _storeContext.CurrentStore.Id).ToList();
             foreach (ShoppingCartItem item in currentcart)
             {
                 _shoppingCartService.DeleteShoppingCartItem(item);
             }
-            foreach (ProductAttributeMobile item in products)
+            foreach (ProductAttributeMobile item in products.Where(a=> a.HasWarning== false))
             {
                 var product = _productService.GetProductById(item.ProductId);
 
@@ -561,7 +705,7 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
 
                 //    return BadRequest(addToCartWarnings);
 
-            }
+            //}
 
 
             //        };
@@ -682,10 +826,10 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
                 var product = _productService.GetProductById(productAtrribute.ProductId);
                 if (product == null)
                 {
-                    return Json(new
-                    {
-                        redirect = Url.RouteUrl("Homepage")
-                    });
+                    //return Json(new
+                    //{
+                    //    redirect = Url.RouteUrl("Homepage")
+                    //});
                 }
                 if (buynow == true || shoppingCartTypeId == 3 || shoppingCartTypeId == 4)
                     productAtrribute.Selected = true;
@@ -693,11 +837,11 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
                 //we can add only simple products
                 if (product.ProductType != ProductType.SimpleProduct)
                 {
-                    return Json(new
-                    {
-                        success = false,
-                        message = "Only simple products could be added to the cart"
-                    });
+                    //return Json(new
+                    //{
+                    //    success = false,
+                    //    message = "Only simple products could be added to the cart"
+                    //});
                 }
 
                 ShoppingCartItem updatecartitem = null;
@@ -797,7 +941,7 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
             }
 
         }
-        public ShoppingCartModel.CalculatedFee EstimateFee(ShoppingCartType shoppingCartType)
+        private ShoppingCartModel.CalculatedFee EstimateFee(ShoppingCartType shoppingCartType)
         {
             var customer = _workContext.CurrentCustomer;
 
@@ -897,7 +1041,7 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
             var shoppingcart = _shoppingCartService.GetShoppingCart(customer, shoppingCartType);
             shoppingCartModel = _shoppingCartModelFactory.PrepareShoppingCartModel(shoppingCartModel, shoppingcart, true, true, true);
 
-            foreach (Nop.Web.Models.ShoppingCart.ShoppingCartModel.ShoppingCartItemModel item in shoppingCartModel.Items)
+            foreach (var item in shoppingCartModel.Items)
             {
                 var product = _productService.GetProductById(item.ProductId);
 
@@ -1320,6 +1464,22 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
 
             return placeOrderResult;
         }
+        private PlaceOrderResult PlaceOrderOfflineRaffle(Order newOrder, Customer customer)
+        {
+            var processPaymentRequest = new ProcessPaymentRequest
+            {
+                StoreId = newOrder.StoreId,
+                CustomerId = customer.Id,
+                PaymentMethodSystemName = newOrder.PaymentMethodSystemName,
+                OrderGuid = newOrder.OrderGuid,
+                OrderGuidGeneratedOnUtc = DateTime.Now
+            };
+
+            GenerateOrderGuid(processPaymentRequest);
+            var placeOrderResult = _orderProcessingService.PlaceOfflineRaffleOrder(processPaymentRequest);
+
+            return placeOrderResult;
+        }
         private string ProcessPaymentRequest() {
             var order = _orderService.SearchOrders(storeId: _storeContext.CurrentStore.Id, customerId: _workContext.CurrentCustomer.Id, pageSize: 1).FirstOrDefault();
 
@@ -1459,7 +1619,7 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
         }
 
 
-        public virtual string AddProductAttribute(string attributesXml, ProductAttributeMapping productAttributeMapping, string value, int? quantity = null)
+       private string AddProductAttribute(string attributesXml, ProductAttributeMapping productAttributeMapping, string value, int? quantity = null)
         {
             var result = string.Empty;
             try

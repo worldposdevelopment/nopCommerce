@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Nop.Core;
 using Nop.Core.Caching;
 using Nop.Core.Domain.Media;
+using Nop.Plugin.Misc.WebAPI.Filter;
 using Nop.Services.Caching;
 using Nop.Services.Catalog;
 using Nop.Services.Customers;
@@ -22,7 +23,10 @@ using static Nop.Web.Models.Catalog.CategoryModel;
 
 namespace Nop.Plugin.Misc.WebAPI.Controllers
 {
-    public class CategoryController : BasePublicController
+    [ApiKeyAuth]
+    [Route("")]
+    [ApiController]
+    public class CategoryController : ControllerBase
     {
         private readonly ICategoryService _category;
         private readonly IWorkContext _workContext;

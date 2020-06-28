@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 using Nop.Core;
 using Nop.Core.Domain.Common;
+using Nop.Plugin.Misc.WebAPI.Filter;
 using Nop.Services.Common;
 using Nop.Services.Customers;
 using Nop.Services.Directory;
@@ -21,8 +22,10 @@ using StackExchange.Profiling.Internal;
 
 namespace Nop.Plugin.Misc.WebAPI.Controllers
 {
-
-    public class AddressController : BaseController
+    [ApiKeyAuth]
+    [Route("")]
+    [ApiController]
+    public class AddressController : ControllerBase
     {
         private readonly ICustomerService _customerService;
         private readonly IWorkContext _workContext;

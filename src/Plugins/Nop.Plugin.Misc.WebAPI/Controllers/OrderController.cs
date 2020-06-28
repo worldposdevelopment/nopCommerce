@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Nop.Core;
 using Nop.Core.Domain.Media;
+using Nop.Plugin.Misc.WebAPI.Filter;
 using Nop.Services.Catalog;
 using Nop.Services.Customers;
 using Nop.Services.Localization;
@@ -20,7 +21,10 @@ using Nop.Web.Models.Media;
 
 namespace Nop.Plugin.Misc.WebAPI.Controllers
 {
-    public class OrderController : BasePublicController
+    [ApiKeyAuth]
+    [Route("")]
+    [ApiController]
+    public class OrderController : ControllerBase
     {
         private readonly ICustomerService _customerService;
         private readonly IWorkContext _workContext;
@@ -41,13 +45,7 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
             _productService = productService;
             _localizationService = localizationService;
     }
-        // GET: /<controller>/
-        public IActionResult Index()
-        {
-
-            var model = _orderModelFactory.PrepareCustomerOrderListModel();
-            return View(model);
-        }
+   
         [HttpGet("api/orders")]
         public IActionResult Orders(String mobileno)
         {
@@ -80,7 +78,7 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
             return Ok(model);
 
         }
-        public virtual PictureModel PrepareCartItemPictureModel(int productid, int pictureSize, bool showDefaultPicture, string productName)
+        private  PictureModel PrepareCartItemPictureModel(int productid, int pictureSize, bool showDefaultPicture, string productName)
         {
 
             var product = _productService.GetProductById(productid);

@@ -118,6 +118,7 @@ namespace Nop.Services.Catalog
             bool visibleIndividuallyOnly = false,
             bool markedAsNewOnly = false,
             bool? featuredProducts = null,
+            string size = null,
             decimal? priceMin = null,
             decimal? priceMax = null,
             int productTagId = 0,
@@ -180,6 +181,7 @@ namespace Nop.Services.Catalog
             bool visibleIndividuallyOnly = false,
             bool markedAsNewOnly = false,
             bool? featuredProducts = null,
+             string size = null,
             decimal? priceMin = null,
             decimal? priceMax = null,
             int productTagId = 0,
@@ -204,6 +206,10 @@ namespace Nop.Services.Catalog
         IPagedList<Product> GetProductsByProductAtributeId(int productAttributeId,
             int pageIndex = 0, int pageSize = int.MaxValue);
 
+
+       IList<String> GetProductAtributeValueNames();
+        IPagedList<Product> GetProductsByProductAtributeValueName(string name,
+        int pageIndex = 0, int pageSize = int.MaxValue);
         /// <summary>
         /// Gets associated products
         /// </summary>
@@ -212,6 +218,7 @@ namespace Nop.Services.Catalog
         /// <param name="vendorId">Vendor identifier; 0 to load all records</param>
         /// <param name="showHidden">A value indicating whether to show hidden records</param>
         /// <returns>Products</returns>
+        /// 
         IList<Product> GetAssociatedProducts(int parentGroupedProductId,
             int storeId = 0, int vendorId = 0, bool showHidden = false);
 
