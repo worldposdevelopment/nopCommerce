@@ -19,6 +19,7 @@ using Nop.Services.Authentication;
 using Nop.Services.Authentication.External;
 using Nop.Services.Blogs;
 using Nop.Services.Caching;
+using Nop.Services.CampaignPromo;
 using Nop.Services.Catalog;
 using Nop.Services.Cms;
 using Nop.Services.Common;
@@ -121,6 +122,8 @@ namespace Nop.Web.Framework.Infrastructure
             //store context
             builder.RegisterType<WebStoreContext>().As<IStoreContext>().InstancePerLifetimeScope();
 
+            //added services
+            builder.RegisterType<CampaignPromoService>().As<ICampaignPromoService>().InstancePerLifetimeScope();
             //services
             builder.RegisterType<BackInStockSubscriptionService>().As<IBackInStockSubscriptionService>().InstancePerLifetimeScope();
             builder.RegisterType<CategoryService>().As<ICategoryService>().InstancePerLifetimeScope();

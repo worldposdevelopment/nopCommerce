@@ -17,6 +17,7 @@ using Nop.Core.Domain.Payments;
 using Nop.Core.Domain.Shipping;
 using Nop.Plugin.Misc.WebAPI.Filter;
 using Nop.Plugin.Misc.WebAPI.Models;
+using Nop.Services.CampaignPromo;
 using Nop.Services.Catalog;
 using Nop.Services.Common;
 using Nop.Services.Customers;
@@ -67,7 +68,8 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
         private readonly ILogger _logger;
         private readonly IPaymentService _paymentService;
         private readonly IOrderService _orderService;
-        public CartController(ICustomerService customerService, IShoppingCartService shoppingCartService, IWorkContext workContext, IProductService productService, IStoreContext storeContext, ShoppingCartSettings shoppingCartSettings, IProductAttributeParser productAttributeParser, IShoppingCartModelFactory shoppingCartModelFactory, ICustomerActivityService customerActivityService, ILocalizationService localizationService, IOrderProcessingService orderProcessingService, PaymentSettings paymentSettings, IShippingService shippingService, IGenericAttributeService genericAttributeService, IAddressService addressService, IProductAttributeService productAttributeService, ILogger logger, IProductModelFactory productModelFactory, ICheckoutModelFactory checkoutModelFactory, IOrderTotalCalculationService orderTotalCalculationService, IPriceFormatter priceFormatter, IPaymentService paymentService, IOrderService orderService, IDiscountService discountService)
+        private readonly ICampaignPromoService _campaignPromoService;
+        public CartController(ICustomerService customerService, IShoppingCartService shoppingCartService, IWorkContext workContext, IProductService productService, IStoreContext storeContext, ShoppingCartSettings shoppingCartSettings, IProductAttributeParser productAttributeParser, IShoppingCartModelFactory shoppingCartModelFactory, ICustomerActivityService customerActivityService, ILocalizationService localizationService, IOrderProcessingService orderProcessingService, PaymentSettings paymentSettings, IShippingService shippingService, IGenericAttributeService genericAttributeService, IAddressService addressService, IProductAttributeService productAttributeService, ILogger logger, IProductModelFactory productModelFactory, ICheckoutModelFactory checkoutModelFactory, IOrderTotalCalculationService orderTotalCalculationService, IPriceFormatter priceFormatter, IPaymentService paymentService, IOrderService orderService, IDiscountService discountService, ICampaignPromoService campaignPromoService)
         {
 
             _customerService = customerService;
@@ -94,7 +96,22 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
             _paymentService = paymentService;
             _orderService = orderService;
             _discountService = discountService;
+            _campaignPromoService = campaignPromoService;
     }
+        [HttpGet("api/checkcampaignproduct")]
+        public IActionResult PickupOptions(int productId, string mobileno)
+        {
+            var customer = _customerService.GetCustomerByUsername(mobileno);
+            _workContext.CurrentCustomer = customer;
+            var product = _productService.GetProductById(productId);
+            var valid = _campaignPromoService.ValidPrelaunchPurchase(product);
+            if (valid)
+                return Ok();
+            else
+                return BadRequest();
+            
+
+        }
         [HttpGet("api/selectShipping")]
         public IActionResult SelectShipping(string mobileno, int optionid, bool isshipping, int shoppingCartTypeId)
         {

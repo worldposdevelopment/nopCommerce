@@ -12,33 +12,33 @@ namespace Nop.Services.Messages
         /// Inserts a campaign
         /// </summary>
         /// <param name="campaign">Campaign</param>        
-        void InsertCampaign(Campaign campaign);
+        void InsertCampaign(Nop.Core.Domain.Messages.Campaign campaign);
 
         /// <summary>
         /// Updates a campaign
         /// </summary>
         /// <param name="campaign">Campaign</param>
-        void UpdateCampaign(Campaign campaign);
+        void UpdateCampaign(Nop.Core.Domain.Messages.Campaign campaign);
 
         /// <summary>
         /// Deleted a queued email
         /// </summary>
         /// <param name="campaign">Campaign</param>
-        void DeleteCampaign(Campaign campaign);
+        void DeleteCampaign(Nop.Core.Domain.Messages.Campaign campaign);
 
         /// <summary>
         /// Gets a campaign by identifier
         /// </summary>
         /// <param name="campaignId">Campaign identifier</param>
         /// <returns>Campaign</returns>
-        Campaign GetCampaignById(int campaignId);
+        Nop.Core.Domain.Messages.Campaign GetCampaignById(int campaignId);
 
         /// <summary>
         /// Gets all campaigns
         /// </summary>
         /// <param name="storeId">Store identifier; 0 to load all records</param>
         /// <returns>Campaigns</returns>
-        IList<Campaign> GetAllCampaigns(int storeId = 0);
+        IList<Nop.Core.Domain.Messages.Campaign> GetAllCampaigns(int storeId = 0);
         
         /// <summary>
         /// Sends a campaign to specified emails
@@ -47,7 +47,7 @@ namespace Nop.Services.Messages
         /// <param name="emailAccount">Email account</param>
         /// <param name="subscriptions">Subscriptions</param>
         /// <returns>Total emails sent</returns>
-        int SendCampaign(Campaign campaign, EmailAccount emailAccount,
+        int SendCampaign(Nop.Core.Domain.Messages.Campaign campaign, EmailAccount emailAccount,
             IEnumerable<NewsLetterSubscription> subscriptions);
 
         /// <summary>
@@ -56,6 +56,6 @@ namespace Nop.Services.Messages
         /// <param name="campaign">Campaign</param>
         /// <param name="emailAccount">Email account</param>
         /// <param name="email">Email</param>
-        void SendCampaign(Campaign campaign, EmailAccount emailAccount, string email);
+        void SendCampaign(Nop.Core.Domain.Messages.Campaign campaign, EmailAccount emailAccount, string email);
     }
 }
