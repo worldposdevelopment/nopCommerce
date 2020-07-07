@@ -7,6 +7,7 @@ using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Orders;
 using Nop.Data;
 using Nop.Services.Caching;
+using Nop.Services.CampaignPromo;
 using Nop.Services.Catalog;
 using Nop.Services.Common;
 using Nop.Services.Customers;
@@ -54,7 +55,8 @@ namespace Nop.Services.Tests
             IUrlRecordService urlRecordService = null,
             IWorkContext workContext = null,
             OrderSettings orderSettings = null,
-            ShoppingCartSettings shoppingCartSettings = null) : base(
+            ShoppingCartSettings shoppingCartSettings = null,
+             ICampaignPromoService campaignPromoService = null) : base(
             catalogSettings ?? new CatalogSettings(),
                 aclService ?? new Mock<IAclService>().Object,
                 actionContextAccessor ?? new Mock<IActionContextAccessor>().Object,    
@@ -83,7 +85,8 @@ namespace Nop.Services.Tests
                 urlRecordService ?? new Mock<IUrlRecordService>().Object,
                 workContext ?? new Mock<IWorkContext>().Object,
                 orderSettings ?? new OrderSettings(),
-                shoppingCartSettings ?? new ShoppingCartSettings())
+                shoppingCartSettings ?? new ShoppingCartSettings(),
+                 campaignPromoService ?? new Mock<CampaignPromoService>().Object)
         {
         }
     }

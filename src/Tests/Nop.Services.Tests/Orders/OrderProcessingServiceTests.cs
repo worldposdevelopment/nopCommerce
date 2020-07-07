@@ -328,7 +328,7 @@ namespace Nop.Services.Tests.Orders
                 _paymentSettings,
                 _rewardPointsSettings,
                 _shippingSettings,
-                _taxSettings, null);
+                _taxSettings, null, null);
         }
 
         [Test]

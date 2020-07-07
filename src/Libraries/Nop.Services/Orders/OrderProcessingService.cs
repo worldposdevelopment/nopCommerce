@@ -18,6 +18,7 @@ using Nop.Core.Domain.Shipping;
 using Nop.Core.Domain.Tax;
 using Nop.Core.Domain.Vendors;
 using Nop.Services.Affiliates;
+using Nop.Services.CampaignPromo;
 using Nop.Services.Catalog;
 using Nop.Services.Common;
 using Nop.Services.Customers;
@@ -86,6 +87,7 @@ namespace Nop.Services.Orders
         private readonly ShippingSettings _shippingSettings;
         private readonly TaxSettings _taxSettings;
         private readonly IHttpClientFactory _clientFactory;
+        private readonly ICampaignPromoService _campaignPromoService;
 
 
         #endregion
@@ -135,7 +137,8 @@ namespace Nop.Services.Orders
             RewardPointsSettings rewardPointsSettings,
             ShippingSettings shippingSettings,
             TaxSettings taxSettings,
-            IHttpClientFactory clientFactory)
+            IHttpClientFactory clientFactory,
+            ICampaignPromoService campaignPromoService)
         {
             _currencySettings = currencySettings;
             _addressService = addressService;
@@ -181,6 +184,7 @@ namespace Nop.Services.Orders
             _shippingSettings = shippingSettings;
             _taxSettings = taxSettings;
             _clientFactory = clientFactory;
+            _campaignPromoService = campaignPromoService;
         }
 
         #endregion
@@ -454,7 +458,7 @@ namespace Nop.Services.Orders
             details.CheckoutAttributeDescription = _checkoutAttributeFormatter.FormatAttributes(details.CheckoutAttributesXml, details.Customer);
 
             //load shopping cart
-            details.Cart = _shoppingCartService.GetShoppingCart(details.Customer, ShoppingCartType.OfflineRaffles, processPaymentRequest.StoreId).Where(s => s.SelectedForCheckout > 0).ToList();
+            details.Cart = _shoppingCartService.GetShoppingCart(details.Customer, ShoppingCartType.OfflineRaffles, processPaymentRequest.StoreId).ToList();
 
             if (!details.Cart.Any())
                 throw new NopException("Cart is empty");
@@ -681,7 +685,7 @@ namespace Nop.Services.Orders
             details.CheckoutAttributeDescription = _checkoutAttributeFormatter.FormatAttributes(details.CheckoutAttributesXml, details.Customer);
 
             //load shopping cart
-            details.Cart = _shoppingCartService.GetShoppingCart(details.Customer, ShoppingCartType.OnlineRaffles, processPaymentRequest.StoreId).Where(s => s.SelectedForCheckout > 0).ToList();
+            details.Cart = _shoppingCartService.GetShoppingCart(details.Customer, ShoppingCartType.OnlineRaffles, processPaymentRequest.StoreId).ToList();
 
             if (!details.Cart.Any())
                 throw new NopException("Cart is empty");
@@ -926,6 +930,7 @@ namespace Nop.Services.Orders
                 var sciWarnings = _shoppingCartService.GetShoppingCartItemWarnings(details.Customer,
                     sci.ShoppingCartType, product, processPaymentRequest.StoreId, sci.AttributesXml,
                     sci.CustomerEnteredPrice, sci.RentalStartDateUtc, sci.RentalEndDateUtc, sci.Quantity, false, sci.Id);
+
                 if (sciWarnings.Any())
                     throw new NopException(sciWarnings.Aggregate(string.Empty, (current, next) => $"{current}{next};"));
             }
@@ -1743,8 +1748,7 @@ namespace Nop.Services.Orders
             foreach (var sc in details.Cart)
             {
                 //ifselected
-                if (sc.SelectedForCheckout > 0)
-                {
+              
                     var product = _productService.GetProductById(sc.ProductId);
 
                     //prices
@@ -1805,7 +1809,8 @@ namespace Nop.Services.Orders
                     //inventory
                     _productService.AdjustInventory(product, -sc.Quantity, sc.AttributesXml,
                         string.Format(_localizationService.GetResource("Admin.StockQuantityHistory.Messages.PlaceOrder"), order.Id));
-                }
+                _campaignPromoService.UpdateCampaignPurchase(product, sc.Quantity);
+                
             }
 
             //clear shopping cart
@@ -2022,7 +2027,7 @@ namespace Nop.Services.Orders
         /// <param name="processPaymentRequest">Process payment request</param>
         /// <returns>Place order result</returns>
         public virtual PlaceOrderResult PlaceOfflineRaffleOrder(ProcessPaymentRequest processPaymentRequest)
-        {
+            {
             if (processPaymentRequest == null)
                 throw new ArgumentNullException(nameof(processPaymentRequest));
 
@@ -2412,6 +2417,7 @@ namespace Nop.Services.Orders
 
                     _productService.AdjustInventory(product, orderItem.Quantity, orderItem.AttributesXml,
                         string.Format(_localizationService.GetResource("Admin.StockQuantityHistory.Messages.DeleteOrder"), order.Id));
+                    _campaignPromoService.UpdateCampaignPurchase(product, -orderItem.Quantity);
                 }
             }
 
@@ -2554,6 +2560,7 @@ namespace Nop.Services.Orders
                         AddGiftCards(product, orderItem.AttributesXml, orderItem.Quantity, newOrderItem, amount: orderItem.UnitPriceExclTax);
 
                         //inventory
+                        
                         _productService.AdjustInventory(product, -orderItem.Quantity, orderItem.AttributesXml,
                             string.Format(_localizationService.GetResource("Admin.StockQuantityHistory.Messages.PlaceOrder"), order.Id));
                     }
@@ -2941,6 +2948,7 @@ namespace Nop.Services.Orders
 
                 _productService.AdjustInventory(product, orderItem.Quantity, orderItem.AttributesXml,
                     string.Format(_localizationService.GetResource("Admin.StockQuantityHistory.Messages.CancelOrder"), order.Id));
+                _campaignPromoService.UpdateCampaignPurchase(product, -orderItem.Quantity);
             }
 
             _eventPublisher.Publish(new OrderCancelledEvent(order));

@@ -15,6 +15,7 @@ using Nop.Core.Domain.Orders;
 using Nop.Data;
 using Nop.Services.Caching;
 using Nop.Services.Caching.Extensions;
+using Nop.Services.CampaignPromo;
 using Nop.Services.Catalog;
 using Nop.Services.Common;
 using Nop.Services.Customers;
@@ -66,6 +67,7 @@ namespace Nop.Services.Orders
         private readonly IWorkContext _workContext;
         private readonly OrderSettings _orderSettings;
         private readonly ShoppingCartSettings _shoppingCartSettings;
+        private readonly ICampaignPromoService _campaignPromoService;
 
         #endregion
 
@@ -99,7 +101,8 @@ namespace Nop.Services.Orders
             IUrlRecordService urlRecordService,
             IWorkContext workContext,
             OrderSettings orderSettings,
-            ShoppingCartSettings shoppingCartSettings)
+            ShoppingCartSettings shoppingCartSettings,
+            ICampaignPromoService campaignPromoService)
         {
             _catalogSettings = catalogSettings;
             _aclService = aclService;
@@ -130,6 +133,7 @@ namespace Nop.Services.Orders
             _workContext = workContext;
             _orderSettings = orderSettings;
             _shoppingCartSettings = shoppingCartSettings;
+            _campaignPromoService = campaignPromoService;
         }
 
         #endregion
@@ -182,13 +186,13 @@ namespace Nop.Services.Orders
                 if (!customerEnteredPricesEqual)
                     return false;
             }
-            
-            if (!product.IsRental) 
+
+            if (!product.IsRental)
                 return true;
 
             //rental products
             var rentalInfoEqual = shoppingCartItem.RentalStartDateUtc == rentalStartDate && shoppingCartItem.RentalEndDateUtc == rentalEndDate;
-            
+
             return rentalInfoEqual;
         }
 
@@ -308,7 +312,30 @@ namespace Nop.Services.Orders
                 DeleteShoppingCartItem(cartItem);
             return cartItems.Count;
         }
+        ///<summary>
+        ///Get products with same product ID
+        ///</summary>
+        //public virtual IEnumerable<Product> GetProductsWithSimilarId(IList<ShoppingCartItem> cart, Product product)
+        //{
+        //    if (cart is null)
+        //        throw new ArgumentNullException(nameof(cart));
 
+        //    if (product is null)
+        //        throw new ArgumentNullException(nameof(product));
+
+        //    if (cart.Count == 0)
+        //        yield break;
+
+        //    var productIds = cart.Select(ci => ci.ProductId).ToArray();
+
+        //    var cartProducts = _productService.GetProductsByIds(productIds);
+
+        //    foreach (var cartProduct in cartProducts)
+        //    {
+        //        if (!cartProduct.RequireOtherProducts && _productService.ParseRequiredProductIds(cartProduct).Contains(product.Id))
+        //            yield return cartProduct;
+        //    }
+        //}
         /// <summary>
         /// Get products from shopping cart whether requiring specific product
         /// </summary>
@@ -389,7 +416,7 @@ namespace Nop.Services.Orders
             foreach (var requiredProduct in requiredProducts)
             {
                 var productsRequiringRequiredProduct = GetProductsRequiringProduct(cart, requiredProduct);
-                
+
                 //get the required quantity of the required product
                 var requiredProductRequiredQuantity = quantity * requiredProductQuantity +
 
@@ -618,7 +645,7 @@ namespace Nop.Services.Orders
 
             if (product.AvailableEndDateTimeUtc.HasValue && !availableStartDateError)
 
-             {
+            {
 
                 var availableEndDateTime = DateTime.SpecifyKind(product.AvailableEndDateTimeUtc.Value, DateTimeKind.Utc);
                 if (availableEndDateTime.CompareTo(DateTime.UtcNow) < 0)
@@ -626,12 +653,18 @@ namespace Nop.Services.Orders
                     warnings.Add(_localizationService.GetResource("ShoppingCart.NotAvailable"));
                 }
             }
-
+        
             if (product.IsPrelaunch)
             {
-                var prelaunchError = false;
 
-                if (product.PrelaunchStartDateTime.HasValue)
+                var prelaunchError = false;
+                if (!_campaignPromoService.ValidPrelaunchPurchase(product, quantity))
+                {
+                    prelaunchError = true;
+                    warnings.Add(_localizationService.GetResource("shoppingcart.ineligibleforcampaign"));
+                }
+
+                    if (product.PrelaunchStartDateTime.HasValue)
                 {
                     var prelaunchStartDateTime = DateTime.SpecifyKind(product.PrelaunchStartDateTime.Value, DateTimeKind.Local);
                     if (prelaunchStartDateTime.CompareTo(DateTime.Now) > 0)
@@ -652,6 +685,12 @@ namespace Nop.Services.Orders
 
 
 
+            }
+            if (product.IsOnlineRafflePrize || product.IsOfflineRafflePrize)
+            {
+
+                if (!_campaignPromoService.ValidRafflePurchase(product, quantity))
+                    warnings.Add(_localizationService.GetResource("shoppingcart.ineligibleforcampaign"));
             }
 
             return warnings;
@@ -968,7 +1007,34 @@ namespace Nop.Services.Orders
 
             return warnings;
         }
+        //Prelaunch Warnings
+        public virtual IList<string> GetPrelaunchWarnings(Customer customer, ShoppingCartType shoppingCartType, Product product,int quantity = 1, int storeId = 1)
+        {
+            if (customer == null)
+                throw new ArgumentNullException(nameof(customer));
 
+            if (product == null)
+                throw new ArgumentNullException(nameof(product));
+
+            var warnings = new List<string>();
+            //get customer shopping cart
+            var cart = GetShoppingCart(customer, shoppingCartType, storeId);
+
+            int prelaunchItemQty = quantity;
+            foreach (var shoppingCartItem in cart)
+            {
+                if (shoppingCartItem.ProductId == product.Id)
+                    prelaunchItemQty = prelaunchItemQty + shoppingCartItem.Quantity;
+            
+            }
+            var similarProductId = GetProductsRequiringProduct(cart, product);
+            if (!_campaignPromoService.ValidPrelaunchPurchase(product, prelaunchItemQty))
+                warnings.Add(_localizationService.GetResource("shoppingcart.ineligibleforcampaign"));
+     
+       
+
+            return warnings;
+        }
         /// <summary>
         /// Validates shopping cart item for rental products
         /// </summary>
@@ -1077,6 +1143,8 @@ namespace Nop.Services.Orders
             //rental products
             if (getRentalWarnings)
                 warnings.AddRange(GetRentalProductWarnings(product, rentalStartDate, rentalEndDate));
+            if(product.IsPrelaunch && shoppingCartItemId == 0)
+                warnings.AddRange(GetPrelaunchWarnings(customer, shoppingCartType, product, quantity));
 
             return warnings;
         }

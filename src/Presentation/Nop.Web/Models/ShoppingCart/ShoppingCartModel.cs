@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Core.Domain.Catalog;
+using Nop.Core.Domain.Shipping;
 using Nop.Web.Framework.Models;
 using Nop.Web.Models.Common;
 using Nop.Web.Models.Media;
@@ -37,6 +38,8 @@ namespace Nop.Web.Models.ShoppingCart
         public bool TermsOfServiceOnShoppingCartPage { get; set; }
         public bool TermsOfServiceOnOrderConfirmPage { get; set; }
         public bool TermsOfServicePopup { get; set; }
+        public string TermsOfServicePage = "https://hoopsportal.worldpos.com.my/termsandcondition.html";
+        public PickupPoint PickupPoint { get; set; }
         public DiscountBoxModel DiscountBox { get; set; }
         public GiftCardBoxModel GiftCardBox { get; set; }
         public OrderReviewDataModel OrderReviewData { get; set; }
@@ -186,6 +189,7 @@ namespace Nop.Web.Models.ShoppingCart
             public bool IsShippable { get; set; }
             public AddressModel ShippingAddress { get; set; }
             public bool SelectedPickupInStore { get; set; }
+
             public AddressModel PickupAddress { get; set; }
             public string ShippingMethod { get; set; }
 

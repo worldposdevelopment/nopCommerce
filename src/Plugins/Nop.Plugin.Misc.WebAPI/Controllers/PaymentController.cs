@@ -99,6 +99,7 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
                 if (order == null)
                     return NotFound();
                 var customer = _customerService.GetCustomerById(order.CustomerId);
+                _workContext.CurrentCustomer = customer;
 
                 //order note
                 _orderService.InsertOrderNote(new OrderNote
@@ -167,18 +168,21 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
                 if (order == null)
                     return BadRequest();
                 var customer = _customerService.GetCustomerById(order.CustomerId);
+                _workContext.CurrentCustomer = customer;
+
                 //order note
                 _orderService.InsertOrderNote(new OrderNote
                 {
                     OrderId = order.Id,
-                    Note = "PaymentFailed: ",
+                    Note = "PaymentFailed: Bad Payment Attempted",
                     DisplayToCustomer = false,
                     CreatedOnUtc = DateTime.UtcNow
                 });
                 order.AuthorizationTransactionId = authcode;
                 order.CaptureTransactionId = transactionid;
-                _orderService.UpdateOrder(order);
                 order.CardType = paymentmethod;
+                _orderService.UpdateOrder(order);
+          
                 _orderProcessingService.CancelOrder(order, false);
               
                 return Ok(new PaymentDetailsDTO { ordernumber = ordernumber, total = _priceFormatter.FormatPrice(order.OrderTotal), mobileno = customer.Username, status = false });
