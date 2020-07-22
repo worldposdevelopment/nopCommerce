@@ -21,7 +21,7 @@ li{list-style:none;}
 a:focus{outline:none;}
 .form-control{border-radius:0;}
 input[type="file"]:focus, input[type="checkbox"]:focus, input[type="radio"]:focus{outline:none;}
-.master-column-wrapper{margin-top:30px;}
+.master-column-wrapper{margin-top:30px;min-height:400px}
 
 
 
@@ -237,7 +237,7 @@ input[type="file"]:focus, input[type="checkbox"]:focus, input[type="radio"]:focu
 .footer-middle .payment-method ul .payment-method3{background-position:-118px center;}
 .footer-middle .payment-method ul .payment-method4{background-position:-178px center;}
 .footer-lower .payment-method{float: left;margin-top: 20px;}
-.footer-lower .footer-theme-credit{margin-bottom: 8px;}
+.footer-lower .footer-theme-credit{margin-bottom: 8px;display:none!important}
 .footer-lower .footer-store-theme .theme-selector select{color:#000;padding:5px;margin-top:10px;}
 .footer-middle .title i{color:#9B2335;font-size:18px;margin-right:15px;float:left;}
 .footer .footer-middle ul li a i{color:#9B2335;}
@@ -248,10 +248,12 @@ input[type="file"]:focus, input[type="checkbox"]:focus, input[type="radio"]:focu
 .footer .footer-middle .social-wrapper li a:hover i{color:#9B2335;transition:all 500ms ease-in-out;-moz-transition:all 500ms ease-in-out;-o-transition:all 500ms ease-in-out;-webkit-transition:all 500ms ease-in-out;}
 #newsletter-email::-moz-placeholder{font-size:16px;}
 .newsletter-button:hover{opacity:0.8;transition:all 500ms;-webkit-transition:all 500ms;-o-transition:all 500ms;-moz-transition:all 500ms;}
-
-
+.designedby { display:none !important;
+}
 /* SIDEBAR NAVIGATION STYLE */
-.box-shadow-wrapper .listbox ul li,.box-shadow-wrapper .listbox .nav.nav-list,.box-shadow-wrapper .listbox .sublist.nav.nav-list{clear:both;}
+.box-shadow-wrapper .listbox ul li, .box-shadow-wrapper .listbox .nav.nav-list, .box-shadow-wrapper .listbox .sublist.nav.nav-list {
+  clear: both;
+}
 .box-shadow-wrapper .listbox ul li:last-child a {border-bottom :none;}
 .block-popular-tags.sidebar .nav > li > a:hover,.block-popular-tags.sidebar .nav > li > a:focus{background:none;}
 #customerTaxType, #customerCurrency, #customerlanguage{border:1px solid #ddd;}

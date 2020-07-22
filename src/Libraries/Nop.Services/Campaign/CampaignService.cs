@@ -125,7 +125,7 @@ namespace Nop.Services.CampaignPromo
                 validcampaign = (from cr in _campaignRaffle.Table
                                  join cm in _campaignMaster.Table on cr.CampaignId equals cm.Id
                                  join cp in _campaignProduct.Table on cm.CampaignUid equals cp.CampaignUid
-                                 where cr.IsWinner == true && cr.HasClaimed < cp.MaxPurchase && cr.CustomerMobile == customer.Username && cp.ProductID == product.Id
+                                 where cr.IsWinner == true && cr.CustomerMobile == customer.Username && cp.ProductID == product.Id
                                  orderby cm.Id descending
                                  select new CampaignMaster { Id = cm.Id, MaxPurchase = cp.MaxPurchase }).FirstOrDefault();
             else
@@ -144,13 +144,13 @@ namespace Nop.Services.CampaignPromo
                 _campaignUserPurchase.Update(campaignPurchase);
 
                     }
-            if(product.IsOfflineRafflePrize || product.IsOnlineRafflePrize)
-            { 
-            var campaignRaffle = _campaignRaffle.Table.Where(a => a.CampaignId == validcampaign.Id && a.CustomerMobile == customer.Username).FirstOrDefault();
-            if (campaignRaffle != null)
-                campaignRaffle.HasClaimed = campaignRaffle.HasClaimed + qty;
-            _campaignRaffle.Update(campaignRaffle);
-            }
+            //if(product.IsOfflineRafflePrize || product.IsOnlineRafflePrize)
+            //{ 
+            //var campaignRaffle = _campaignRaffle.Table.Where(a => a.CampaignId == validcampaign.Id && a.CustomerMobile == customer.Username).FirstOrDefault();
+            //if (campaignRaffle != null)
+            //    campaignRaffle.HasClaimed = campaignRaffle.HasClaimed + qty;
+            //_campaignRaffle.Update(campaignRaffle);
+            //}
 
         }
         public int GetStorePickupPointOfflineRaffle(Product product) {

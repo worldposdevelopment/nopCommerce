@@ -126,6 +126,52 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
         //    return Ok(result);
 
         //}
+    
+    [HttpPost("api/auth/updateroles")]
+    public ActionResult RoleUpdate(String mobileno, String role)
+    {
+            var customer = _customerService.GetCustomerByUsername(mobileno);
+            var roles = _customerService.GetCustomerRoles(customer);
+
+            foreach (var customerrole in roles)
+            {
+                if (customerrole.Name != "Registered" ||
+                    customerrole.Name != "DEV" ||
+                    customerrole.Name != "Vendors")
+                    _customerService.RemoveCustomerRoleMapping(customer, customerrole);
+
+
+
+
+            }
+            if (role == "Registered")
+                return Ok();
+
+              var newrole =_customerService.GetCustomerRoleBySystemName(role);
+                var newcustomerrolemapping = new CustomerCustomerRoleMapping {
+               CustomerId=  newrole.Id,
+               CustomerRoleId = customer.Id};
+
+             _customerService.AddCustomerRoleMapping(newcustomerrolemapping);
+            return Ok();
+       
+          
     }
+
+    //[HttpGet("api/auth/sendactivation")]
+    //public ActionResult SendSmsActivation(String phoneNumber)
+    //{
+    //    var result = _userValidationService.SendSmsValidation(phoneNumber);
+    //    return Ok(result);
+
+    //}
+    //[HttpGet("api/auth/confirmactivation")]
+    //public ActionResult ConfirmSmsActivation(String phoneNumber, String phoneCode)
+    //{
+    //    var result = _userValidationService.ConfirmVerificationCode(phoneNumber, phoneCode);
+    //    return Ok(result);
+
+    //}
+}
 }
 

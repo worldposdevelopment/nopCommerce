@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Nop.Core.Domain.Orders;
 using Nop.Web.Framework.Models;
+using static Nop.Web.Models.Order.OrderDetailsModel;
 
 namespace Nop.Web.Models.Order
 {
@@ -12,6 +13,7 @@ namespace Nop.Web.Models.Order
             Orders = new List<OrderDetailsModel>();
             RecurringOrders = new List<RecurringOrderModel>();
             RecurringPaymentErrors = new List<string>();
+   
         }
 
         public IList<OrderDetailsModel> Orders { get; set; }
@@ -22,6 +24,10 @@ namespace Nop.Web.Models.Order
 
         public partial class OrderDetailsModel : BaseNopEntityModel
         {
+            public OrderDetailsModel()
+            {
+                Items = new List<OrderItemModel>();
+            }
             public string CustomOrderNumber { get; set; }
             public string OrderTotal { get; set; }
             public bool IsReturnRequestAllowed { get; set; }
@@ -30,6 +36,7 @@ namespace Nop.Web.Models.Order
             public string PaymentStatus { get; set; }
             public string ShippingStatus { get; set; }
             public DateTime CreatedOn { get; set; }
+            public IList<OrderItemModel> Items { get; set; }
         }
 
         public partial class RecurringOrderModel : BaseNopEntityModel

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Nop.Core;
+using Nop.Core.Domain.Common;
 using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Media;
 using Nop.Core.Domain.Messages;
@@ -11,7 +12,9 @@ using Nop.Core.Domain.Orders;
 using Nop.Core.Domain.Payments;
 using Nop.Plugin.Misc.WebAPI.DTO;
 using Nop.Plugin.Misc.WebAPI.Filter;
+using Nop.Plugin.Misc.WebAPI.Models.Smart;
 using Nop.Services.Catalog;
+using Nop.Services.Common;
 using Nop.Services.Customers;
 using Nop.Services.Localization;
 using Nop.Services.Media;
@@ -21,6 +24,7 @@ using Nop.Web.Controllers;
 using Nop.Web.Factories;
 using Nop.Web.Infrastructure.Cache;
 using Nop.Web.Models.Media;
+using Org.BouncyCastle.Asn1.Esf;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -41,7 +45,12 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
         private readonly IProductService _productService;
         private readonly ILocalizationService _localizationService;
         private readonly IPriceFormatter _priceFormatter;
-        public PaymentContoller(ICustomerService customerService, IWorkContext workContext, IOrderModelFactory orderModelFactory, IOrderService orderService, IPictureService pictureService, MediaSettings mediaSettings, IProductService productService, ILocalizationService localizationService, IOrderProcessingService orderProcessingService, IPriceFormatter priceFormatter)
+        private readonly IAddressService _addressService;
+        public PaymentContoller(ICustomerService customerService, IWorkContext workContext, 
+            IOrderModelFactory orderModelFactory, IOrderService orderService, IPictureService pictureService, MediaSettings mediaSettings, 
+            IProductService productService, ILocalizationService localizationService, IOrderProcessingService orderProcessingService,
+            IPriceFormatter priceFormatter,
+            IAddressService addressService)
         {
             _customerService = customerService;
             _workContext = workContext;
@@ -53,7 +62,8 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
             _productService = productService;
             _localizationService = localizationService;
             _priceFormatter = priceFormatter;
-    }
+            _addressService = addressService;
+        }
  
         [HttpGet("api/paymentcallback")]
         public IActionResult PaymentCallback(string mobilenumber, string orderguid)
@@ -110,32 +120,6 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
                     CreatedOnUtc = DateTime.UtcNow
                 });
 
-                //validate order total
-                //var orderTotalSentToPayPal = _genericAttributeService.GetAttribute<decimal?>(order, EghlHelper.OrderTotalSentToPayPal);
-                //if (orderTotalSentToPayPal.HasValue && mcGross != orderTotalSentToPayPal.Value)
-                //{
-                //    var errorStr = $"PayPal PDT. Returned order total {mcGross} doesn't equal order total {order.OrderTotal}. Order# {order.Id}.";
-                //    //log
-                //    _logger.Error(errorStr);
-                //    //order note
-                //    _orderService.InsertOrderNote(new OrderNote
-                //    {
-                //        OrderId = order.Id,
-                //        Note = errorStr,
-                //        DisplayToCustomer = false,
-                //        CreatedOnUtc = DateTime.UtcNow
-                //    });
-
-                //    return RedirectToAction("Index", "Home", new { area = string.Empty });
-                //}
-
-                //clear attribute
-                //if (orderTotalSentToPayPal.HasValue)
-                //    _genericAttributeService.SaveAttribute<decimal?>(order, EghlHelper.OrderTotalSentToPayPal, null);
-
-                //if (newPaymentStatus != PaymentStatus.Paid)
-                //    return RedirectToRoute("CheckoutCompleted", new { orderId = order.Id });
-
                 if (!_orderProcessingService.CanMarkOrderAsPaid(order))
                     return RedirectToRoute("CheckoutCompleted", new { orderId = order.Id });
 
@@ -145,7 +129,95 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
                 order.CardType = paymentmethod;
                 _orderService.UpdateOrder(order);
                 _orderProcessingService.MarkOrderAsPaid(order);
-                return Ok(new PaymentDetailsDTO { ordernumber = ordernumber, total = _priceFormatter.FormatPrice(order.OrderTotal), mobileno = customer.Username, status = true });
+
+                //        string ShipToAddress1;
+                //        string ShipToAddress2;
+                //        string ShipToAddress3;
+                //        string ShipToAddress4;
+
+                //Address shippingAddress = null;
+                //        if (order.ShippingAddressId.HasValue)
+                //        {
+                //            shippingAddress = _addressService.GetAddressById(order.ShippingAddressId.Value);
+                //            if(!String.IsNullOrEmpty(shippingAddress.Address1))
+                //            ShipToAddress1 = shippingAddress.Address1;
+                //            if (!String.IsNullOrEmpty(shippingAddress.Address2))
+                //                ShipToAddress2 = shippingAddress.Address2;
+                //            if (!String.IsNullOrEmpty(shippingAddress.Address2))
+                //                ShipToAddress2 = shippingAddress.Address2;
+
+                //        }
+            
+                var smartDo = new SmartDo
+                {
+                    DocumentHeader = new Documentheader
+                    {
+                        AcCusDeliveryOrderMID = order.CustomOrderNumber,
+                        AcLocationID = "APP",
+                        DocumentDate = "/Date(" + Convert.ToInt64((DateTime.Now - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds) + ")/",
+                        DeliveryDate = "/Date(" + Convert.ToInt64((DateTime.Now.AddDays(7) - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds) + ")/",
+                        DocumentNetAmount = order.OrderTotal,
+                        DocumentCentBalance = 0,
+                        DocumentFinalAmount = order.OrderTotal,
+                        ShipToAddress1 = "",
+                        ShipToAddress2 = "",
+                        ShipToAddress3 = "",
+                        ShipToAddress4 = "",
+                        ShipToAttention = "",
+                        ShipToContact1 = "",
+                        ShipToContact2 = "",
+                        DocumentRemark = "",
+                        RefDocumentNo = "",
+                        DocumentYourReference = "",
+                        ExtraRemark1 = "",
+                        ExtraRemark2 = "",
+                        ExtraRemark3 = "",
+                        ExtraRemark4 = "",
+                        ShipToFax = "",
+                        ShipToPhone1 = "",
+                        ShipToPhone2 = "",
+                        ShipToRemark = "",
+                        ShipToShipVia = "",
+                        AcCustomerID = customer.Username
+
+
+
+                    }
+                };
+             
+             
+
+            
+                var orderitems = _orderService.GetOrderItems(order.Id);
+            foreach (var item in orderitems)
+
+            { var product = _productService.GetProductById(item.ProductId);
+                    var newSmartDetail = new Documentdetail
+                    {
+                        AcCusDeliveryOrderMID = order.CustomOrderNumber,
+                        AcStockID = _productService.FormatSku(product, item.AttributesXml),
+                        ItemDiscountAmount = item.DiscountAmountInclTax / item.Quantity,
+                        ItemUnitPrice = (item.DiscountAmountInclTax + item.UnitPriceInclTax) / item.Quantity,
+                        ItemGrossTotal = (item.DiscountAmountInclTax + item.UnitPriceInclTax) * item.Quantity,
+                        ItemQuantity = item.Quantity,
+                        ItemTotalPrice = item.PriceInclTax,
+                        AcStockUOMID = "UNIT",
+                        ItemRemark1 = product.Name
+                    };
+                    smartDo.DocumentDetails.Add(newSmartDetail);
+            }
+
+
+
+
+
+
+
+
+
+
+
+            return Ok(smartDo);
    
             }
             else
