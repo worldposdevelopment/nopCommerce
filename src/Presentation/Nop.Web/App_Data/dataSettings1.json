@@ -1,0 +1,5 @@
+﻿{
+  "DataConnectionString": "Data Source=LAPTOP-SR9ROA8F\\SQLEXPRESS;Initial Catalog=nopcommerce;user=sa;password=",
+  "DataProvider": "sqlserver",
+  "RawDataSettings": {}
+}

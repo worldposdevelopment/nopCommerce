@@ -751,6 +751,9 @@ namespace Nop.Web.Factories
                     var attributeValues = _productAttributeService.GetProductAttributeValues(attribute.Id);
                     foreach (var attributeValue in attributeValues)
                     {
+                        var attributevaluecombination = _productAttributeService.GetAllProductAttributeCombinations(product.Id);
+                        int attributeqty = attributevaluecombination.Where(a => a.Sku == product.Sku + "-" + attributeValue.Name).Select(a => a.StockQuantity).FirstOrDefault();
+
                         var valueModel = new ProductDetailsModel.ProductAttributeValueModel
                         {
                             Id = attributeValue.Id,
@@ -758,7 +761,7 @@ namespace Nop.Web.Factories
                             ColorSquaresRgb = attributeValue.ColorSquaresRgb, //used with "Color squares" attribute type
                             IsPreSelected = attributeValue.IsPreSelected,
                             CustomerEntersQty = attributeValue.CustomerEntersQty,
-                            Quantity = attributeValue.Quantity
+                            Quantity = attributeqty
                         };
                         attributeModel.Values.Add(valueModel);
 
