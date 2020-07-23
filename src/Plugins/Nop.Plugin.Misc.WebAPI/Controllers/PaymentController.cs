@@ -184,10 +184,10 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
 
                     }
                 };
-             
-             
 
-            
+
+
+                int itemcount = 0;
                 var orderitems = _orderService.GetOrderItems(order.Id);
             foreach (var item in orderitems)
 
@@ -202,7 +202,9 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
                         ItemQuantity = item.Quantity,
                         ItemTotalPrice = item.PriceInclTax,
                         AcStockUOMID = "UNIT",
-                        ItemRemark1 = product.Name
+                        ItemRemark1 = product.Name,
+                        ItemNo = (++itemcount).ToString()
+
                     };
                     smartDo.DocumentDetails.Add(newSmartDetail);
             }

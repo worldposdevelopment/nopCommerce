@@ -127,7 +127,7 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
 
         //}
     
-    [HttpPost("api/auth/updateroles")]
+    [HttpGet("api/auth/updateroles")]
     public ActionResult RoleUpdate(String mobileno, String role)
     {
             var customer = _customerService.GetCustomerByUsername(mobileno);
@@ -135,8 +135,8 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
 
             foreach (var customerrole in roles)
             {
-                if (customerrole.Name != "Registered" ||
-                    customerrole.Name != "DEV" ||
+                if (customerrole.Name != "Registered" &&
+                    customerrole.Name != "DEV" &&
                     customerrole.Name != "Vendors")
                     _customerService.RemoveCustomerRoleMapping(customer, customerrole);
 
@@ -149,8 +149,9 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
 
               var newrole =_customerService.GetCustomerRoleBySystemName(role);
                 var newcustomerrolemapping = new CustomerCustomerRoleMapping {
-               CustomerId=  newrole.Id,
-               CustomerRoleId = customer.Id};
+               CustomerId= customer.Id ,
+               CustomerRoleId = newrole.Id
+                };
 
              _customerService.AddCustomerRoleMapping(newcustomerrolemapping);
             return Ok();

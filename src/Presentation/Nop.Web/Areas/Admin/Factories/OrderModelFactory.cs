@@ -935,8 +935,8 @@ namespace Nop.Web.Areas.Admin.Factories
             var orderStatusIds = (searchModel.OrderStatusIds?.Contains(0) ?? true) ? null : searchModel.OrderStatusIds.ToList();
             var paymentStatusIds = (searchModel.PaymentStatusIds?.Contains(0) ?? true) ? null : searchModel.PaymentStatusIds.ToList();
             var shippingStatusIds = (searchModel.ShippingStatusIds?.Contains(0) ?? true) ? null : searchModel.ShippingStatusIds.ToList();
-            if (_workContext.CurrentVendor != null)
-                searchModel.VendorId = _workContext.CurrentVendor.Id;
+            //if (_workContext.CurrentVendor != null)
+            //    searchModel.VendorId = _workContext.CurrentVendor.Id;
             var startDateValue = !searchModel.StartDate.HasValue ? null
                 : (DateTime?)_dateTimeHelper.ConvertToUtcTime(searchModel.StartDate.Value, _dateTimeHelper.CurrentTimeZone);
             var endDateValue = !searchModel.EndDate.HasValue ? null
