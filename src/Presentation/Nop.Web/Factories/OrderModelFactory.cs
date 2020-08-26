@@ -242,6 +242,7 @@ namespace Nop.Web.Factories
                     {
                         Id = shipment.Id,
                         TrackingNumber = shipment.TrackingNumber,
+                        TrackingUrl = shipment.TrackingUrl
                     };
                     if (shipment.ShippedDateUtc.HasValue)
                         shipmentModel.ShippedDate = _dateTimeHelper.ConvertToUserTime(shipment.ShippedDateUtc.Value, DateTimeKind.Utc);

@@ -375,18 +375,6 @@ namespace Nop.Services.Catalog
                 //initial price
                 var price = overriddenProductPrice ?? product.Price;
 
-                //tier prices
-                var tierPrice = _productService.GetPreferredTierPrice(product, customer, _storeContext.CurrentStore.Id, quantity);
-                if (tierPrice != null)
-                    price = tierPrice.Price;
-
-                //additional charge
-                price += additionalCharge;
-
-                //rental products
-                if (product.IsRental)
-                    if (rentalStartDate.HasValue && rentalEndDate.HasValue)
-                        price *= _productService.GetRentalPeriods(product, rentalStartDate.Value, rentalEndDate.Value);
 
                 if (includeDiscounts)
                 {
@@ -400,6 +388,18 @@ namespace Nop.Services.Catalog
                         appliedDiscountAmount = tmpDiscountAmount;
                     }
                 }
+                //tier prices
+                var tierPrice = _productService.GetPreferredTierPrice(product, customer, _storeContext.CurrentStore.Id, quantity);
+                if (tierPrice != null && !(appliedDiscountAmount > 0))
+                    price = tierPrice.Price;
+
+                //additional charge
+                price += additionalCharge;
+
+                //rental products
+                if (product.IsRental)
+                    if (rentalStartDate.HasValue && rentalEndDate.HasValue)
+                        price *= _productService.GetRentalPeriods(product, rentalStartDate.Value, rentalEndDate.Value);
 
                 if (price < decimal.Zero)
                     price = decimal.Zero;

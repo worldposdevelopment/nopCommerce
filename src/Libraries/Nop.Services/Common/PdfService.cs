@@ -1219,6 +1219,7 @@ namespace Nop.Services.Common
         /// <param name="vendorId">Vendor identifier to limit products; 0 to print all products. If specified, then totals won't be printed</param>
         public virtual void PrintOrdersToPdf(Stream stream, IList<Order> orders, int languageId = 0, int vendorId = 0)
         {
+            vendorId = 0;
             if (stream == null)
                 throw new ArgumentNullException(nameof(stream));
 

@@ -35,6 +35,8 @@ namespace Nop.Web.Areas.Admin.Models.Orders
 
         [NopResourceDisplayName("Admin.Orders.Shipments.TrackingNumber")]
         public string TrackingNumber { get; set; }
+        [NopResourceDisplayName("Admin.Orders.Shipments.TrackingUrl")]
+        public string TrackingUrl { get; set; }
 
         public string TrackingNumberUrl { get; set; }
 

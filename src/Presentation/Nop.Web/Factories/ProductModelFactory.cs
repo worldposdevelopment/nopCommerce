@@ -327,7 +327,8 @@ namespace Nop.Web.Factories
 
                         if (finalPriceWithoutDiscountBase != finalPriceWithDiscountBase)
                             strikeThroughPrice = finalPriceWithoutDiscount;
-
+                        if (strikeThroughPrice < oldPrice && strikeThroughPrice != decimal.Zero)
+                            strikeThroughPrice = oldPrice;
                         if (strikeThroughPrice > decimal.Zero)
                             priceModel.OldPrice = _priceFormatter.FormatPrice(strikeThroughPrice);
 
@@ -753,7 +754,8 @@ namespace Nop.Web.Factories
                     {
                         var attributevaluecombination = _productAttributeService.GetAllProductAttributeCombinations(product.Id);
                         int attributeqty = attributevaluecombination.Where(a => a.Sku == product.Sku + "-" + attributeValue.Name).Select(a => a.StockQuantity).FirstOrDefault();
-
+                        if (attributeqty > 0)
+                        { 
                         var valueModel = new ProductDetailsModel.ProductAttributeValueModel
                         {
                             Id = attributeValue.Id,
@@ -818,6 +820,7 @@ namespace Nop.Web.Factories
 
                         //picture of a product attribute value
                         valueModel.PictureId = attributeValue.PictureId;
+                    }
                     }
                 }
 

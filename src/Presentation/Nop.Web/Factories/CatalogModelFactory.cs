@@ -497,12 +497,33 @@ namespace Nop.Web.Factories
                 pageSize: command.PageSize, size: command.Size);
             model.Products = _productModelFactory.PrepareProductOverviewModels(products).ToList();
 
+            if (command.OrderBy.HasValue)
+            {
+                if (command.OrderBy.Value == 10)
+                {
+                    model.Products = model.Products.OrderBy(a => a.ProductPrice.PriceValue).ToList();
+                    command.PageNumber = 1;
+                    command.TotalPages = 1;
+                }
+                else
+                if (command.OrderBy.Value == 11)
+                {
+
+                    model.Products = model.Products.OrderByDescending(a => a.ProductPrice.PriceValue).ToList();
+                    command.PageNumber = 1;
+                    command.TotalPages = 1;
+                }
+
+            }
             model.PagingFilteringContext.LoadPagedList(products);
 
             //specs
             model.PagingFilteringContext.SpecificationFilter.PrepareSpecsFilters(alreadyFilteredSpecOptionIds,
                 filterableSpecificationAttributeOptionIds?.ToArray(), _cacheKeyService,
                 _specificationAttributeService, _localizationService, _webHelper, _workContext, _staticCacheManager);
+
+
+
 
             return model;
         }
@@ -887,6 +908,25 @@ namespace Nop.Web.Factories
 
             model.PagingFilteringContext.LoadPagedList(products);
 
+            if (command.OrderBy.HasValue)
+            {
+                if (command.OrderBy.Value == 10)
+                {
+                    model.Products = model.Products.OrderBy(a => a.ProductPrice.PriceValue).ToList();
+                    command.PageNumber = 1;
+                    command.TotalPages = 1;
+                }
+                else
+                if (command.OrderBy.Value == 11)
+                {
+
+                    model.Products = model.Products.OrderByDescending(a => a.ProductPrice.PriceValue).ToList();
+                    command.PageNumber = 1;
+                    command.TotalPages = 1;
+                }
+
+            }
+
             return model;
         }
 
@@ -1042,6 +1082,25 @@ namespace Nop.Web.Factories
             model.Products = _productModelFactory.PrepareProductOverviewModels(products).ToList();
 
             model.PagingFilteringContext.LoadPagedList(products);
+
+            if (command.OrderBy.HasValue)
+            {
+                if (command.OrderBy.Value == 10)
+                { 
+                    model.Products = model.Products.OrderBy(a => a.ProductPrice.PriceValue).ToList();
+                    command.PageNumber = 1;
+                    command.TotalPages = 1;
+                }
+                else
+                if (command.OrderBy.Value == 11)
+                { 
+
+                    model.Products = model.Products.OrderByDescending(a => a.ProductPrice.PriceValue).ToList();
+                    command.PageNumber = 1;
+                    command.TotalPages = 1;
+                }
+
+            }
 
             return model;
         }

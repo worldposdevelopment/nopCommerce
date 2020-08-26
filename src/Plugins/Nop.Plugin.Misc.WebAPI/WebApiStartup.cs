@@ -44,10 +44,10 @@ namespace Nop.Plugin.Misc.WebAPI
             // services.AddAutoMapper(typeof(Startup));
             //     services.AddDbContext<DataContext>(options => options.UseSqlServer(Configuration["ConnectionStrings:hoopsstationDB"])); ;
 
-            services.AddSwaggerGen(c => {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Hoops API", Version = "v1" });
-                c.OperationFilter<ApiKeyHeaderFilter>();
-            });
+            //services.AddSwaggerGen(c => {
+            //    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Hoops API", Version = "v1" });
+            //    c.OperationFilter<ApiKeyHeaderFilter>();
+            //});
             //  services.AddIdentity<User, Role>().AddEntityFrameworkStores<DataContext>().AddDefaultTokenProviders().AddRoleValidator<RoleValidator<Role>>().AddRoleManager<RoleManager<Role>>().AddSignInManager<SignInManager<User>>();
 
             //var key = Encoding.ASCII.GetBytes("TestJWT");
@@ -83,16 +83,18 @@ namespace Nop.Plugin.Misc.WebAPI
         public void Configure(IApplicationBuilder application)
         {
 
-        //    application.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
-           // application.UseRouting();
-            application.UseSwagger();
+            //    application.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+            // application.UseRouting();
 
-            application.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("../swagger/v1/swagger.json", "My API V1");
-            }
-            );
-        
+
+            //    application.UseSwagger();
+            //    application.UseSwaggerUI(c =>
+            //{
+            //    c.SwaggerEndpoint("../swagger/v1/swagger.json", "My API V1");
+            //}
+            //);
+            //}
+
 
         }
     }

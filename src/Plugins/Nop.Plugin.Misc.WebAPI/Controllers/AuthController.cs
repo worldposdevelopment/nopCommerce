@@ -50,10 +50,15 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
                 _logger.Information("Email is empty", null, null);
             if (String.IsNullOrEmpty(model.Username))
                 _logger.Information("Username is empty", null, null);
-            if (String.IsNullOrEmpty(model.Email))
+                if (model.Addresses == null)
+                    _logger.Information("Address is empty", null, null);
+                
+                if (String.IsNullOrEmpty(model.Email))
                  model.Email = model.Username + "@shop2.worldpos.com.my";
 
-                _logger.Information(model.Email + model.Username+ model.Addresses.First(), null, null);
+            if(model.Addresses != null)
+                    _logger.Information(model.Email + model.Username + model.Addresses.First(), null, null);
+
                 var customer = _customerService.InsertGuestCustomer();
                 var registrationRequest = new CustomerRegistrationRequest(customer,
                             model.Email,
@@ -65,20 +70,24 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
                 var result = _customerRegistrationService.RegisterCustomer(registrationRequest);
                 if (result.Success)
                 {
-                    var address = model.Addresses.First();
-                    
-                    if (address.CountryId == 0 || address.CountryId == null)
-                        address.CountryId = 131;
-                    if (address.StateProvinceId == 0)
-                        address.StateProvinceId = null;
-            
-                    _addressService.InsertAddress(model.Addresses.First());
-                    _customerService.InsertCustomerAddress(customer, address);
-                    customer.ShippingAddressId = _customerService.GetAddressesByCustomerId(customer.Id).Select (a => a.Id).First();
-                    
-                    _logger.Information("Insert address: Customer: "+ customer.Id +": address: "+ _customerService.GetAddressesByCustomerId(customer.Id).Select(a => a.Id).First(), null, null);
+                    if (model.Addresses != null)
+                    {
+                        var address = model.Addresses.First();
 
-                    customer.BillingAddressId = _customerService.GetAddressesByCustomerId(customer.Id).Select(a => a.Id).First();
+                        if (address.CountryId == 0 || address.CountryId == null)
+                            address.CountryId = 131;
+                        if (address.StateProvinceId == 0)
+                            address.StateProvinceId = null;
+
+                        _addressService.InsertAddress(model.Addresses.First());
+                        _customerService.InsertCustomerAddress(customer, address);
+                        customer.ShippingAddressId = _customerService.GetAddressesByCustomerId(customer.Id).Select(a => a.Id).First();
+                        _logger.Information("Insert address: Customer: " + customer.Id + ": address: " + _customerService.GetAddressesByCustomerId(customer.Id).Select(a => a.Id).First(), null, null);
+                        customer.BillingAddressId = _customerService.GetAddressesByCustomerId(customer.Id).Select(a => a.Id).First();
+                    }
+                    _logger.Information("Customer no address: Customer: "+ customer.Id +": address: "+ _customerService.GetAddressesByCustomerId(customer.Id).Select(a => a.Id).First(), null, null);
+
+                  
            
                     _customerService.UpdateCustomer(customer);
                     if (!String.IsNullOrEmpty(model.Gender))

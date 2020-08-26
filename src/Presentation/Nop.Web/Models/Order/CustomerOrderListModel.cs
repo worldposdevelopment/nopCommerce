@@ -27,6 +27,8 @@ namespace Nop.Web.Models.Order
             public OrderDetailsModel()
             {
                 Items = new List<OrderItemModel>();
+                Shipments = new List<ShipmentBriefModel>();
+
             }
             public string CustomOrderNumber { get; set; }
             public string OrderTotal { get; set; }
@@ -37,6 +39,7 @@ namespace Nop.Web.Models.Order
             public string ShippingStatus { get; set; }
             public DateTime CreatedOn { get; set; }
             public IList<OrderItemModel> Items { get; set; }
+            public IList<ShipmentBriefModel> Shipments { get; set; }
         }
 
         public partial class RecurringOrderModel : BaseNopEntityModel

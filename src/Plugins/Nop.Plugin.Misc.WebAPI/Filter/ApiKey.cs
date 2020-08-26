@@ -29,7 +29,7 @@ namespace Nop.Plugin.Misc.WebAPI.Filter
 
             //var configuration = context.HttpContext.RequestServices.GetRequiredService<IConfiguration>();
             //var apiKey = configuration.GetValue<string>("ApiKey");
-            if (!("1qazXSW@" == potentialApiKey.ToString()))
+            if (!("c1599f06-cd7f-49ed-b7a3-0cd9712163b2" == potentialApiKey.ToString()))
             {
                 context.Result = new UnauthorizedResult();
                 return;

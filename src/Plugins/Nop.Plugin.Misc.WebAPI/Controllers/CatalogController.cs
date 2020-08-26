@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Nop.Core;
+using Nop.Core.Caching;
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Localization;
 using Nop.Core.Domain.Orders;
@@ -53,7 +55,8 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
         private readonly ILogger _logger;
         private readonly IShoppingCartService _shoppingCartService;
         private readonly IManufacturerService _manufacturerService;
-        public CatalogController(ICategoryService categoryService, IProductService productService, ICatalogModelFactory catalogModelFactory, IProductModelFactory productModelFactory, IVendorService vendorService, ICustomerService customerService, IWorkContext workContext, CatalogSettings catalogSettings, IReviewTypeService reviewTypeService, ILocalizationService localizationService, IOrderService orderService, IStoreContext storeContext, LocalizationSettings localizationSettings, ICustomerActivityService customerActivityService, ILogger logger, IShoppingCartService shoppingCartService, IManufacturerService manufacturerService)
+        private readonly IStaticCacheManager _staticCacheManager;
+        public CatalogController(ICategoryService categoryService, IProductService productService, ICatalogModelFactory catalogModelFactory, IProductModelFactory productModelFactory, IVendorService vendorService, ICustomerService customerService, IWorkContext workContext, CatalogSettings catalogSettings, IReviewTypeService reviewTypeService, ILocalizationService localizationService, IOrderService orderService, IStoreContext storeContext, LocalizationSettings localizationSettings, ICustomerActivityService customerActivityService, ILogger logger, IShoppingCartService shoppingCartService, IManufacturerService manufacturerService, IStaticCacheManager staticCacheManager)
         {
             _catalogModelFactory = catalogModelFactory;
             _categoryService = categoryService;
@@ -72,9 +75,17 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
             _logger = logger;
             _shoppingCartService = shoppingCartService;
             _manufacturerService =  manufacturerService;
+            _staticCacheManager = staticCacheManager;
 
         }
-
+        [AllowAnonymous]
+        [HttpGet("api/clearcache")]
+        public IActionResult ClearCache()
+        {
+            var customer = _customerService.GetCustomerByUsername("Guest");
+            _staticCacheManager.Clear();
+            return Ok();
+        }
         [HttpGet("api/getmanufacturerproducts")]
         public IActionResult GetManufacturer(int manufacturerid, [FromQuery]CatalogPagingFilteringModel command, string mobileno)
         {
@@ -113,6 +124,7 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
 
             var vendor = _vendorService.GetVendorById(1);
             var model = _catalogModelFactory.PrepareVendorModel(vendor, command);
+          //  _logger.Information("GetCatalogReturn: " + model.ToJson(), null, null);
 
             //template
             //  var templateViewPath = _catalogModelFactory.PrepareCategoryTemplateViewPath(category.CategoryTemplateId);
@@ -159,7 +171,7 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
 
             //model
             var model = _catalogModelFactory.PrepareCategoryModel(category, command);
-            //_logger.Information("GetCatalogReturn: "+model.ToJson(), null, null);
+   
 
             //template
             //  var templateViewPath = _catalogModelFactory.PrepareCategoryTemplateViewPath(category.CategoryTemplateId);

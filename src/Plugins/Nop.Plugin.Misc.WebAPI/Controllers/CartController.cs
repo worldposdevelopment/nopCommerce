@@ -1105,9 +1105,7 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
         [HttpGet("api/selectcartitem")]
         public IActionResult SelectCartItem(string mobileno, int shoppingCartItemId, Boolean selected, int shoppingCartId)
         {
-            if (shoppingCartId < 1)
-                shoppingCartId = 1;
-            var shoppingCartType = (ShoppingCartType)shoppingCartId;
+
 
             var customer = _customerService.GetCustomerByUsername(mobileno);
             if (customer == null)
@@ -1118,12 +1116,16 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
             }
 
 
-            _logger.Information("Shopping cart type = " + shoppingCartId, null, null);
-            _workContext.CurrentCustomer = customer;
 
-            _shoppingCartService.SetSelectShoppingCartItem(customer, shoppingCartItemId, selected, shoppingCartType);
+            _workContext.CurrentCustomer = customer;
+            if (shoppingCartId < 1)
+                shoppingCartId = 1;
+            var shoppingCartType = (ShoppingCartType)shoppingCartId;
+            _logger.Information("Shopping cart type = " + shoppingCartId, null, null);
+            _logger.Information("Selected items for checkout: " + customer.Username);
+            _shoppingCartService.SetSelectShoppingCartItem(_workContext.CurrentCustomer, shoppingCartItemId, selected, shoppingCartType);
             var shoppingCartModel = new ShoppingCartModel();
-            var shoppingcart = _shoppingCartService.GetShoppingCart(customer, shoppingCartType);
+            var shoppingcart = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, shoppingCartType, _storeContext.CurrentStore.Id);
             shoppingCartModel = _shoppingCartModelFactory.PrepareShoppingCartModel(shoppingCartModel, shoppingcart, true, true, true);
 
             foreach (var item in shoppingCartModel.Items)
@@ -1137,7 +1139,10 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
 
 
             }
+       
+
             shoppingCartModel.TotalFee = EstimateFee(shoppingCartType);
+            _logger.Information("Returned selected items" + shoppingCartModel.ToJson(), null, null);
             return Ok(shoppingCartModel);
 
         }
@@ -1575,7 +1580,7 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
             {
                 Order = order
             };
-            var baseUrl = "https://hoopsportal.worldpos.com.my/processpayghl.aspx?";
+            var baseUrl = "https://hoopsmarketing.worldpos.com.my/processpayghl.aspx?";
 
             //create common query parameters for the request
             var queryParameters = CreateQueryParameters(postProcessPaymentRequest);
@@ -1846,7 +1851,7 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
             var roundedOrderTotal = Math.Round(postProcessPaymentRequest.Order.OrderTotal, 2);
             var amount = roundedOrderTotal.ToString("0.00", CultureInfo.InvariantCulture);
             //create query parameters
-            var hash = ComputeSha256Hash("hss12345HSS" + postProcessPaymentRequest.Order.CustomOrderNumber + "https://hoopsportal.worldpos.com.my/paystatusghl" + amount + postProcessPaymentRequest.Order.CustomerCurrencyCode + postProcessPaymentRequest.Order.CustomerIp);
+            var hash = ComputeSha256Hash("wJK5prwuHSS" + postProcessPaymentRequest.Order.CustomOrderNumber + "https://hoopsmarketing.worldpos.com.my/paystatusghl"+ "https://hoopsmarketing.worldpos.com.my/paycallback" + amount + postProcessPaymentRequest.Order.CustomerCurrencyCode + postProcessPaymentRequest.Order.CustomerIp);
             var customer = _workContext.CurrentCustomer;
             var address = _customerService.GetAddressesByCustomerId(customer.Id).FirstOrDefault();
             return new Dictionary<string, string>
@@ -1863,7 +1868,8 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
                 ["OrderNumber"] = postProcessPaymentRequest.Order.CustomOrderNumber,
                 //PDT, IPN and cancel URL
                 ["PaymentDesc"] = "Hoopsstation app purchase",
-                ["MerchantReturnURL"] = "https://hoopsportal.worldpos.com.my/paystatusghl",
+                ["MerchantReturnURL"] = "https://hoopsmarketing.worldpos.com.my/paystatusghl",
+                ["MerchantCallbackURL"] = "https://hoopsmarketing.worldpos.com.my/paycallback",
                 ["Amount"] = amount,
 
                 ["CustIP"] = postProcessPaymentRequest.Order.CustomerIp + "",

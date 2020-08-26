@@ -85,6 +85,10 @@ namespace Nop.Web.Models.Order
 
         public partial class OrderItemModel : BaseNopEntityModel
         {
+            public OrderItemModel()
+            {
+
+            }
             public Guid OrderItemGuid { get; set; }
             public string Sku { get; set; }
             public int ProductId { get; set; }
@@ -126,6 +130,7 @@ namespace Nop.Web.Models.Order
 
         public partial class ShipmentBriefModel : BaseNopEntityModel
         {
+            public string TrackingUrl { get; set; }
             public string TrackingNumber { get; set; }
             public DateTime? ShippedDate { get; set; }
             public DateTime? DeliveryDate { get; set; }

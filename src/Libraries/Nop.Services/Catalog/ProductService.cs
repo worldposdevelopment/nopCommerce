@@ -828,11 +828,11 @@ namespace Nop.Services.Catalog
 
         public virtual IList<String> GetProductAtributeValueNames()
         {
-            var query = from pav in _productAttributeValueRepository.Table 
-                        orderby pav.Name
-                        select pav.Name;
+            var query = _productAttributeValueRepository.EntityFromSql("ProductAttributesSelection").Select(a=>a.Name).Distinct().ToList();
+            query.Insert(0, "");
 
-            return query.Distinct().ToList();
+            return query;
+           
         }
 
 
@@ -1507,6 +1507,8 @@ namespace Nop.Services.Catalog
                 if (combination != null)
                 {
                     combination.StockQuantity += quantityToChange;
+                    if (combination.StockQuantity < 0)
+                        throw new Exception("Emergency stock lock down");
                     _productAttributeService.UpdateProductAttributeCombination(combination);
 
                     //quantity change history

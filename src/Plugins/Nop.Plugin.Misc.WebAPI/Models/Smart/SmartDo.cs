@@ -21,7 +21,7 @@ namespace Nop.Plugin.Misc.WebAPI.Models.Smart
 
     public class Documentheader
     {
-        public string AcCusDeliveryOrderMID { get; set; }
+        public string AcCusInvoiceMID { get; set; }
         public string AcCustomerID { get; set; }
         public string AcLocationID { get; set; }
         public string DocumentDate { get; set; }
@@ -52,7 +52,7 @@ namespace Nop.Plugin.Misc.WebAPI.Models.Smart
 
     public class Documentdetail
     {
-        public string AcCusDeliveryOrderMID { get; set; }
+        public string AcCusInvoiceMID { get; set; }
         public string ItemNo { get; set; }
         public string AcStockID { get; set; }
         public string AcStockUOMID { get; set; }

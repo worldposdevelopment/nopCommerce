@@ -16,6 +16,7 @@ namespace Nop.Core.Domain.Shipping
         /// Gets or sets the tracking number of this shipment
         /// </summary>
         public string TrackingNumber { get; set; }
+        public string TrackingUrl { get; set; }
 
         /// <summary>
         /// Gets or sets the total weight of this shipment

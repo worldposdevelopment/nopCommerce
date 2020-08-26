@@ -255,6 +255,8 @@ namespace Nop.Web.Framework
                 {
                     //create guest if not exists
                     customer = _customerService.InsertGuestCustomer();
+                 //   customer = _customerService.GetCustomerByUsername("Guest");
+                  //  _cachedCustomer = customer;
                 }
 
                 if (!customer.Deleted && customer.Active && !customer.RequireReLogin)

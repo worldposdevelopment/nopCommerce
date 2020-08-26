@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Nop.Core;
 using Nop.Core.Domain.Common;
@@ -98,6 +99,8 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
           
 
         }
+
+
         [HttpGet("api/paymentstatus")]
         public IActionResult SetPaymentStatus(bool success, string ordernumber, string authcode, string transactionid, string paymentmethod)
         {
@@ -152,10 +155,10 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
                 {
                     DocumentHeader = new Documentheader
                     {
-                        AcCusDeliveryOrderMID = order.CustomOrderNumber,
+                        AcCusInvoiceMID = order.CustomOrderNumber,
                         AcLocationID = "APP",
-                        DocumentDate = "/Date(" + Convert.ToInt64((DateTime.Now - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds) + ")/",
-                        DeliveryDate = "/Date(" + Convert.ToInt64((DateTime.Now.AddDays(7) - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds) + ")/",
+                        DocumentDate = "/Date(" + Convert.ToInt64((DateTime.Now.Date - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds) + ")/",
+                        DeliveryDate = "/Date(" + Convert.ToInt64((DateTime.Now.AddDays(7).Date - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds) + ")/",
                         DocumentNetAmount = order.OrderTotal,
                         DocumentCentBalance = 0,
                         DocumentFinalAmount = order.OrderTotal,
@@ -194,7 +197,7 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
             { var product = _productService.GetProductById(item.ProductId);
                     var newSmartDetail = new Documentdetail
                     {
-                        AcCusDeliveryOrderMID = order.CustomOrderNumber,
+                        AcCusInvoiceMID = order.CustomOrderNumber,
                         AcStockID = _productService.FormatSku(product, item.AttributesXml),
                         ItemDiscountAmount = item.DiscountAmountInclTax / item.Quantity,
                         ItemUnitPrice = (item.DiscountAmountInclTax + item.UnitPriceInclTax) / item.Quantity,
@@ -208,7 +211,27 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
                     };
                     smartDo.DocumentDetails.Add(newSmartDetail);
             }
+                if (order.OrderShippingInclTax > 0)
+                {
 
+                    var newSmartDetail = new Documentdetail
+                    {
+                        AcCusInvoiceMID = order.CustomOrderNumber,
+                        AcStockID = "SVC001",
+                        ItemDiscountAmount = 0,
+                        ItemUnitPrice = order.OrderShippingInclTax,
+                        ItemGrossTotal = order.OrderShippingInclTax,
+                        ItemQuantity = 1,
+                        ItemTotalPrice = order.OrderShippingInclTax,
+                        AcStockUOMID = "UNIT",
+                        ItemRemark1 = "Shipping",
+                        
+                        ItemNo = (++itemcount).ToString()
+
+                    };
+                    smartDo.DocumentDetails.Add(newSmartDetail);
+
+                }
 
 
 

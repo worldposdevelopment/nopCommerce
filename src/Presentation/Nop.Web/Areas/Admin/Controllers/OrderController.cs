@@ -2043,6 +2043,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             {
                 OrderId = order.Id,
                 TrackingNumber = model.TrackingNumber,
+                TrackingUrl = model.TrackingUrl,
                 TotalWeight = null,
                 AdminComment = model.AdminComment,
                 CreatedOnUtc = DateTime.UtcNow
@@ -2230,6 +2231,27 @@ namespace Nop.Web.Areas.Admin.Controllers
             return RedirectToAction("Edit", new { id = orderId });
         }
 
+        [HttpPost, ActionName("ShipmentDetails")]
+        [FormValueRequired("settrackingurl")]
+        public virtual IActionResult SetTrackingUrl(ShipmentModel model)
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+                return AccessDeniedView();
+
+            //try to get a shipment with the specified id
+            var shipment = _shipmentService.GetShipmentById(model.Id);
+            if (shipment == null)
+                return RedirectToAction("List");
+
+            //a vendor should have access only to his products
+            if (_workContext.CurrentVendor != null && !HasAccessToShipment(shipment))
+                return RedirectToAction("List");
+
+            shipment.TrackingUrl = model.TrackingUrl;
+            _shipmentService.UpdateShipment(shipment);
+
+            return RedirectToAction("ShipmentDetails", new { id = shipment.Id });
+        }
         [HttpPost, ActionName("ShipmentDetails")]
         [FormValueRequired("settrackingnumber")]
         public virtual IActionResult SetTrackingNumber(ShipmentModel model)
@@ -2711,8 +2733,8 @@ namespace Nop.Web.Areas.Admin.Controllers
                 return AccessDeniedDataTablesJson();
 
             //a vendor doesn't have access to this report
-            if (_workContext.CurrentVendor != null)
-                return Content(string.Empty);
+           // if (_workContext.CurrentVendor != null)
+         //       return Content(string.Empty);
 
             //prepare model
             var model = _orderModelFactory.PrepareOrderAverageReportListModel(searchModel);
@@ -2727,8 +2749,8 @@ namespace Nop.Web.Areas.Admin.Controllers
                 return AccessDeniedDataTablesJson();
 
             //a vendor doesn't have access to this report
-            if (_workContext.CurrentVendor != null)
-                return Content(string.Empty);
+            //if (_workContext.CurrentVendor != null)
+            //    return Content(string.Empty);
 
             //prepare model
             var model = _orderModelFactory.PrepareOrderIncompleteReportListModel(searchModel);
@@ -2742,8 +2764,8 @@ namespace Nop.Web.Areas.Admin.Controllers
                 return Content(string.Empty);
 
             //a vendor doesn't have access to this report
-            if (_workContext.CurrentVendor != null)
-                return Content(string.Empty);
+         //   if (_workContext.CurrentVendor != null)
+         //       return Content(string.Empty);
 
             var result = new List<object>();
 
