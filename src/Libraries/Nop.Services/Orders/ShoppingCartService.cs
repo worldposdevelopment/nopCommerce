@@ -712,9 +712,9 @@ namespace Nop.Services.Orders
             if (customer == null)
                 throw new ArgumentNullException(nameof(customer));
 
-          //  var items = _sciRepository.Table.Where(sci => sci.CustomerId == customer.Id);
-
-            var shoppingCartItem = _sciRepository.Table.Where(a=>a.Id == shoppingCartItemId).FirstOrDefault();
+            //  var items = _sciRepository.Table.Where(sci => sci.CustomerId == customer.Id);
+            var shoppingCartItem = _sciRepository.ToCachedGetById(shoppingCartItemId);
+           // var shoppingCartItem = _sciRepository.Table.Where(a=>a.Id == shoppingCartItemId).FirstOrDefault();
             if (shoppingCartItem != null)
             {
                 if(selected)
@@ -723,6 +723,7 @@ namespace Nop.Services.Orders
                     shoppingCartItem.SelectedForCheckout = 0;
 
                 _sciRepository.Update(shoppingCartItem);
+                _eventPublisher.EntityUpdated(shoppingCartItem);
             }
             
         }

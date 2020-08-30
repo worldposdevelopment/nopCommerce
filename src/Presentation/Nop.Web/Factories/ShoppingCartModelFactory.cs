@@ -908,33 +908,33 @@ namespace Nop.Web.Factories
 
             //payment methods
             //all payment methods (do not filter by country here as it could be not specified yet)
-            var paymentMethods = _paymentPluginManager
-                .LoadActivePlugins(_workContext.CurrentCustomer, _storeContext.CurrentStore.Id)
-                .Where(pm => !pm.HidePaymentMethod(cart)).ToList();
-            //payment methods displayed during checkout (not with "Button" type)
-            var nonButtonPaymentMethods = paymentMethods
-                .Where(pm => pm.PaymentMethodType != PaymentMethodType.Button)
-                .ToList();
-            //"button" payment methods(*displayed on the shopping cart page)
-            var buttonPaymentMethods = paymentMethods
-                .Where(pm => pm.PaymentMethodType == PaymentMethodType.Button)
-                .ToList();
-            foreach (var pm in buttonPaymentMethods)
-            {
-                if (_shoppingCartService.ShoppingCartIsRecurring(cart) && pm.RecurringPaymentType == RecurringPaymentType.NotSupported)
-                    continue;
+            //var paymentMethods = _paymentPluginManager
+            //    .LoadActivePlugins(_workContext.CurrentCustomer, _storeContext.CurrentStore.Id)
+            //    .Where(pm => !pm.HidePaymentMethod(cart)).ToList();
+            ////payment methods displayed during checkout (not with "Button" type)
+            //var nonButtonPaymentMethods = paymentMethods
+            //    .Where(pm => pm.PaymentMethodType != PaymentMethodType.Button)
+            //    .ToList();
+            ////"button" payment methods(*displayed on the shopping cart page)
+            //var buttonPaymentMethods = paymentMethods
+            //    .Where(pm => pm.PaymentMethodType == PaymentMethodType.Button)
+            //    .ToList();
+            //foreach (var pm in buttonPaymentMethods)
+            //{
+            //    if (_shoppingCartService.ShoppingCartIsRecurring(cart) && pm.RecurringPaymentType == RecurringPaymentType.NotSupported)
+            //        continue;
 
-                var viewComponentName = pm.GetPublicViewComponentName();
-                model.ButtonPaymentMethodViewComponentNames.Add(viewComponentName);
-            }
+            //    var viewComponentName = pm.GetPublicViewComponentName();
+            //    model.ButtonPaymentMethodViewComponentNames.Add(viewComponentName);
+            //}
             //hide "Checkout" button if we have only "Button" payment methods
-            model.HideCheckoutButton = !nonButtonPaymentMethods.Any() && model.ButtonPaymentMethodViewComponentNames.Any();
+            //model.HideCheckoutButton = !nonButtonPaymentMethods.Any() && model.ButtonPaymentMethodViewComponentNames.Any();
 
             //order review data
-            if (prepareAndDisplayOrderReviewData)
-            {
-                model.OrderReviewData = PrepareOrderReviewDataModel(cart);
-            }
+            //if (prepareAndDisplayOrderReviewData)
+            //{
+            //    model.OrderReviewData = PrepareOrderReviewDataModel(cart);
+            //}
 
             return model;
         }

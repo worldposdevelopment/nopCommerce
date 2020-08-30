@@ -988,9 +988,10 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
             }
 
         }
-        private ShoppingCartModel.CalculatedFee EstimateFee(ShoppingCartType shoppingCartType)
+        private ShoppingCartModel.CalculatedFee EstimateFee(ShoppingCartType shoppingCartType, Customer customer = null)
         {
-            var customer = _workContext.CurrentCustomer;
+            if(customer == null)
+                customer =_workContext.CurrentCustomer;
 
             decimal shippingfee = 0;
             decimal carttotal = 0;
@@ -1006,7 +1007,7 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
 
 
             }
-            var shoppingcart = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, shoppingCartType, _storeContext.CurrentStore.Id);
+            var shoppingcart = _shoppingCartService.GetShoppingCart(customer, shoppingCartType, _storeContext.CurrentStore.Id);
             var address = _customerService.GetCustomerShippingAddress(customer);
 
             if (address == null)
@@ -1123,9 +1124,11 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
             var shoppingCartType = (ShoppingCartType)shoppingCartId;
             _logger.Information("Shopping cart type = " + shoppingCartId, null, null);
             _logger.Information("Selected items for checkout: " + customer.Username);
-            _shoppingCartService.SetSelectShoppingCartItem(_workContext.CurrentCustomer, shoppingCartItemId, selected, shoppingCartType);
+            _shoppingCartService.SetSelectShoppingCartItem(customer, shoppingCartItemId, selected, shoppingCartType);
+
             var shoppingCartModel = new ShoppingCartModel();
-            var shoppingcart = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, shoppingCartType, _storeContext.CurrentStore.Id);
+            var shoppingcart = _shoppingCartService.GetShoppingCart(customer, shoppingCartType, _storeContext.CurrentStore.Id);
+
             shoppingCartModel = _shoppingCartModelFactory.PrepareShoppingCartModel(shoppingCartModel, shoppingcart, true, true, true);
 
             foreach (var item in shoppingCartModel.Items)
@@ -1141,7 +1144,7 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
             }
        
 
-            shoppingCartModel.TotalFee = EstimateFee(shoppingCartType);
+            shoppingCartModel.TotalFee = EstimateFee(shoppingCartType, customer);
             _logger.Information("Returned selected items" + shoppingCartModel.ToJson(), null, null);
             return Ok(shoppingCartModel);
 
