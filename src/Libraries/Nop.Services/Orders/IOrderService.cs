@@ -139,7 +139,7 @@ namespace Nop.Services.Orders
         #endregion
 
         #region Orders items
-
+        String GetUsernameByOrder(int orderId);
         /// <summary>
         /// Gets an order item
         /// </summary>

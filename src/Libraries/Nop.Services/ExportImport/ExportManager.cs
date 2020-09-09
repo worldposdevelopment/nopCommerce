@@ -640,10 +640,15 @@ namespace Nop.Services.ExportImport
 
         private byte[] ExportOrderToXlsxWithProducts(PropertyByName<Order>[] properties, IEnumerable<Order> itemsToExport)
         {
+
+
             var orderItemProperties = new[]
             {
+                 new PropertyByName<OrderItem>("OrderNumber", oi => _orderService.GetOrderById(oi.OrderId).CustomOrderNumber),
                 new PropertyByName<OrderItem>("Name", oi => _productService.GetProductById(oi.ProductId).Name),
+                               new PropertyByName<OrderItem>("Description", oi => oi.AttributeDescription),
                 new PropertyByName<OrderItem>("Sku", oi => _productService.GetProductById(oi.ProductId).Sku),
+
                 new PropertyByName<OrderItem>("PriceExclTax", oi => oi.UnitPriceExclTax),
                 new PropertyByName<OrderItem>("PriceInclTax", oi => oi.UnitPriceInclTax),
                 new PropertyByName<OrderItem>("Quantity", oi => oi.Quantity),
@@ -669,13 +674,13 @@ namespace Nop.Services.ExportImport
 
                 //create Headers and format them 
                 var manager = new PropertyManager<Order>(properties, _catalogSettings);
-                manager.WriteCaption(worksheet);
-
+                manager.WriteCaption(worksheet, 1, 11);
+                orderItemsManager.WriteCaption(worksheet, 1);
                 var row = 2;
                 foreach (var order in itemsToExport)
                 {
-                    manager.CurrentObject = order;
-                    manager.WriteToXlsx(worksheet, row++);
+                 //   manager.CurrentObject = order;
+                 //   manager.WriteToXlsx(worksheet, row++);
 
                     //a vendor should have access only to his products
                     var orderItems = _orderService.GetOrderItems(order.Id, vendorId: _workContext.CurrentVendor?.Id ?? 0);
@@ -683,17 +688,20 @@ namespace Nop.Services.ExportImport
                     if (!orderItems.Any())
                         continue;
 
-                    orderItemsManager.WriteCaption(worksheet, row, 2);
-                    worksheet.Row(row).OutlineLevel = 1;
-                    worksheet.Row(row).Collapsed = true;
+                //  
+                    //worksheet.Row(row).OutlineLevel = 1;
+                    //worksheet.Row(row).Collapsed = true;
 
                     foreach (var orederItem in orderItems)
                     {
-                        row++;
+                      //  row++;
+  
                         orderItemsManager.CurrentObject = orederItem;
-                        orderItemsManager.WriteToXlsx(worksheet, row, 2, fpWorksheet);
-                        worksheet.Row(row).OutlineLevel = 1;
-                        worksheet.Row(row).Collapsed = true;
+                        orderItemsManager.WriteToXlsx(worksheet, row,0,fpWorksheet);
+                        manager.CurrentObject = order;
+                        manager.WriteToXlsx(worksheet, row, 11);
+                        //  worksheet.Row(row).OutlineLevel = 1;
+                        // worksheet.Row(row).Collapsed = true;
                     }
 
                     row++;
@@ -1403,7 +1411,7 @@ namespace Nop.Services.ExportImport
             {
                 xmlWriter.WriteStartElement("Order");
 
-                xmlWriter.WriteString("OrderId", order.Id);
+                xmlWriter.WriteString("OrderId", order.CustomOrderNumber);
                 xmlWriter.WriteString("OrderGuid", order.OrderGuid, ignore);
                 xmlWriter.WriteString("StoreId", order.StoreId);
                 xmlWriter.WriteString("CustomerId", order.CustomerId, ignore);
@@ -1524,12 +1532,12 @@ namespace Nop.Services.ExportImport
             //lambda expressions for choosing correct order address
             Address orderAddress(Order o) => _addressService.GetAddressById((o.PickupInStore ? o.PickupAddressId : o.ShippingAddressId) ?? 0);
             Address orderBillingAddress(Order o) => _addressService.GetAddressById(o.BillingAddressId);
-
+            Customer purchasingCustomer(Order o) => _customerService.GetCustomerById(o.CustomerId);
             //property array
             var properties = new[]
             {
-                new PropertyByName<Order>("OrderId", p => p.Id),
-                new PropertyByName<Order>("StoreId", p => p.StoreId),
+           //     new PropertyByName<Order>("OrderId", p => p.CustomOrderNumber),
+        //        new PropertyByName<Order>("StoreId", p => p.StoreId),
                 new PropertyByName<Order>("OrderGuid", p => p.OrderGuid, ignore),
                 new PropertyByName<Order>("CustomerId", p => p.CustomerId, ignore),
                 new PropertyByName<Order>("OrderStatusId", p => p.OrderStatusId, ignore),
@@ -1569,7 +1577,7 @@ namespace Nop.Services.ExportImport
                 new PropertyByName<Order>("BillingAddress1", p => orderBillingAddress(p)?.Address1 ?? string.Empty),
                 new PropertyByName<Order>("BillingAddress2", p => orderBillingAddress(p)?.Address2 ?? string.Empty),
                 new PropertyByName<Order>("BillingZipPostalCode", p => orderBillingAddress(p)?.ZipPostalCode ?? string.Empty),
-                new PropertyByName<Order>("BillingPhoneNumber", p => orderBillingAddress(p)?.PhoneNumber ?? string.Empty),
+                new PropertyByName<Order>("BillingPhoneNumber", p => purchasingCustomer(p)?.Username ?? string.Empty),
                 new PropertyByName<Order>("BillingFaxNumber", p => orderBillingAddress(p)?.FaxNumber ?? string.Empty),
                 new PropertyByName<Order>("ShippingFirstName", p => orderAddress(p)?.FirstName ?? string.Empty),
                 new PropertyByName<Order>("ShippingLastName", p => orderAddress(p)?.LastName ?? string.Empty),
@@ -1582,8 +1590,13 @@ namespace Nop.Services.ExportImport
                 new PropertyByName<Order>("ShippingAddress1", p => orderAddress(p)?.Address1 ?? string.Empty),
                 new PropertyByName<Order>("ShippingAddress2", p => orderAddress(p)?.Address2 ?? string.Empty),
                 new PropertyByName<Order>("ShippingZipPostalCode", p => orderAddress(p)?.ZipPostalCode ?? string.Empty),
-                new PropertyByName<Order>("ShippingPhoneNumber", p => orderAddress(p)?.PhoneNumber ?? string.Empty),
+                new PropertyByName<Order>("ShippingPhoneNumber", p => purchasingCustomer(p)?.Username ?? string.Empty),
                 new PropertyByName<Order>("ShippingFaxNumber", p => orderAddress(p)?.FaxNumber ?? string.Empty)
+
+
+                //adding line items
+                
+     
             };
 
             return _orderSettings.ExportWithProducts

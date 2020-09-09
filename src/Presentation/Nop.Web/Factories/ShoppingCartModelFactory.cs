@@ -884,9 +884,10 @@ namespace Nop.Web.Factories
                     model.DiscountBox.AppliedDiscountsWithCodes.Add(new ShoppingCartModel.DiscountBoxModel.DiscountInfoModel()
                     {
                         Id = discount.Id,
-                        CouponCode = discount.CouponCode
+                        CouponCode = discount.CouponCode,
                     });
                 }
+                model.DiscountBox.IsApplied = true;
             }
 
             model.GiftCardBox.Display = _shoppingCartSettings.ShowGiftCardBox;

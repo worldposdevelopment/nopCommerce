@@ -1069,7 +1069,8 @@ namespace Nop.Web.Factories
                 vendor.AllowCustomersToSelectPageSize,
                 vendor.PageSizeOptions,
                 vendor.PageSize);
-         //   PrepareSizeOptions(model.PagingFilteringContext, command);
+            PrepareSizeOptions(model.PagingFilteringContext, command);
+
             //products
             var products = _productService.SearchProducts(out _,
                 true,

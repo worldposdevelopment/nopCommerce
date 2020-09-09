@@ -30,6 +30,7 @@ using Nop.Services.Payments;
 using Nop.Services.Shipping;
 using Nop.Services.Stores;
 using Nop.Services.Vendors;
+using OfficeOpenXml.FormulaParsing.Excel.Functions.Logical;
 
 namespace Nop.Services.Common
 {
@@ -937,6 +938,8 @@ namespace Nop.Services.Common
         /// <param name="addressTable">PDF table for address</param>
         protected virtual void PrintShippingInfo(Language lang, Order order, Font titleFont, Font font, PdfPTable addressTable)
         {
+
+            var username = _orderService.GetUsernameByOrder(order.Id);
             var shippingAddressPdf = new PdfPTable(1)
             {
                 RunDirection = GetDirection(lang)
@@ -948,7 +951,7 @@ namespace Nop.Services.Common
                 //cell = new PdfPCell();
                 //cell.Border = Rectangle.NO_BORDER;
                 const string indent = "   ";
-
+                
                 if (!order.PickupInStore)
                 {
                     if (order.ShippingAddressId == null || !(_addressService.GetAddressById(order.ShippingAddressId.Value) is Address shippingAddress))
@@ -959,7 +962,7 @@ namespace Nop.Services.Common
                         shippingAddressPdf.AddCell(GetParagraph("PDFInvoice.Company", indent, lang, font, shippingAddress.Company));
                     shippingAddressPdf.AddCell(GetParagraph("PDFInvoice.Name", indent, lang, font, shippingAddress.FirstName + " " + shippingAddress.LastName));
                     if (_addressSettings.PhoneEnabled)
-                        shippingAddressPdf.AddCell(GetParagraph("PDFInvoice.Phone", indent, lang, font, shippingAddress.PhoneNumber));
+                        shippingAddressPdf.AddCell(GetParagraph("PDFInvoice.Phone", indent, lang, font, username));
                     if (_addressSettings.FaxEnabled && !string.IsNullOrEmpty(shippingAddress.FaxNumber))
                         shippingAddressPdf.AddCell(GetParagraph("PDFInvoice.Fax", indent, lang, font, shippingAddress.FaxNumber));
                     if (_addressSettings.StreetAddressEnabled)
@@ -1040,6 +1043,7 @@ namespace Nop.Services.Common
         /// <param name="addressTable">Address PDF table</param>
         protected virtual void PrintBillingInfo(int vendorId, Language lang, Font titleFont, Order order, Font font, PdfPTable addressTable)
         {
+            var username = _orderService.GetUsernameByOrder(order.Id);
             const string indent = "   ";
             var billingAddressPdf = new PdfPTable(1) { RunDirection = GetDirection(lang) };
             billingAddressPdf.DefaultCell.Border = Rectangle.NO_BORDER;
@@ -1054,7 +1058,7 @@ namespace Nop.Services.Common
             billingAddressPdf.AddCell(GetParagraph("PDFInvoice.Name", indent, lang, font, billingAddress.FirstName + " " + billingAddress.LastName));
 
             if (_addressSettings.PhoneEnabled)
-                billingAddressPdf.AddCell(GetParagraph("PDFInvoice.Phone", indent, lang, font, billingAddress.PhoneNumber));
+                billingAddressPdf.AddCell(GetParagraph("PDFInvoice.Phone", indent, lang, font, username));
 
             if (_addressSettings.FaxEnabled && !string.IsNullOrEmpty(billingAddress.FaxNumber))
                 billingAddressPdf.AddCell(GetParagraph("PDFInvoice.Fax", indent, lang, font, billingAddress.FaxNumber));
@@ -1146,14 +1150,14 @@ namespace Nop.Services.Common
 
             //store info
             var store = _storeService.GetStoreById(order.StoreId) ?? _storeContext.CurrentStore;
-            var anchor = new Anchor(store.Url.Trim('/'), font)
+            var anchor = new Anchor(store.CompanyName.Trim('/'), font)
             {
                 Reference = store.CompanyName
             };
 
             var cellHeader = GetPdfCell(string.Format(_localizationService.GetResource("PDFInvoice.Order#", lang.Id), order.CustomOrderNumber), titleFont);
             cellHeader.Phrase.Add(new Phrase(Environment.NewLine));
-            cellHeader.Phrase.Add(new Phrase(anchor));
+         //   cellHeader.Phrase.Add(new Phrase(anchor));
             cellHeader.Phrase.Add(new Phrase(Environment.NewLine));
             cellHeader.Phrase.Add(GetParagraph("PDFInvoice.OrderDate", lang, font, _dateTimeHelper.ConvertToUserTime(order.CreatedOnUtc, DateTimeKind.Utc).ToString("D", new CultureInfo(lang.LanguageCulture))));
             cellHeader.Phrase.Add(new Phrase(Environment.NewLine));

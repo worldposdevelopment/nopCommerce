@@ -486,7 +486,19 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
             {
                 var customer = _customerService.GetCustomerByUsername(mobileno);
                 _workContext.CurrentCustomer = customer;
+                if (customer.BillingAddressId == null)
+                {
+                    var address = _customerService.GetAddressesByCustomerId(customer.Id).FirstOrDefault();
 
+                    if (address == null)
+                        return NotFound();
+                    else
+                    {
+                        customer.BillingAddressId = address.Id;
+                        _customerService.UpdateCustomer(customer);
+
+                    }
+                }
 
                 if (addressid > 0)
                 {
@@ -824,6 +836,27 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
                 }
 
                 _workContext.CurrentCustomer = customer;
+           
+                if (customer.BillingAddressId == null)
+                {
+                    _logger.Information("Billing address is null", null, null);
+                    var address = _customerService.GetAddressesByCustomerId(customer.Id).FirstOrDefault();
+
+                    if (address == null)
+                    {
+                        _logger.Information("No address for user", null, null);
+                        return NotFound();
+
+                    }
+
+
+                    else
+                    {
+                        customer.BillingAddressId = address.Id;
+                        _customerService.UpdateCustomer(customer);
+
+                    }
+                }
                 if (productAtrribute != null)
                     _logger.Information(productAtrribute.ToJson(), null, customer);
                 ////migrate shopping cart
@@ -1854,7 +1887,7 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
             var roundedOrderTotal = Math.Round(postProcessPaymentRequest.Order.OrderTotal, 2);
             var amount = roundedOrderTotal.ToString("0.00", CultureInfo.InvariantCulture);
             //create query parameters
-            var hash = ComputeSha256Hash("wJK5prwuHSS" + postProcessPaymentRequest.Order.CustomOrderNumber + "https://hoopsmarketing.worldpos.com.my/paystatusghl"+ "https://hoopsmarketing.worldpos.com.my/paycallback" + amount + postProcessPaymentRequest.Order.CustomerCurrencyCode + postProcessPaymentRequest.Order.CustomerIp);
+            var hash = ComputeSha256Hash("wJK5prwuHSS" + postProcessPaymentRequest.Order.CustomOrderNumber + "https://hoopsmarketing.worldpos.com.my/paystatusghl"+ "https://hoopsmarketing.worldpos.com.my/paystatusghl" + amount + postProcessPaymentRequest.Order.CustomerCurrencyCode + postProcessPaymentRequest.Order.CustomerIp);
             var customer = _workContext.CurrentCustomer;
             var address = _customerService.GetAddressesByCustomerId(customer.Id).FirstOrDefault();
             return new Dictionary<string, string>
@@ -1872,7 +1905,7 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
                 //PDT, IPN and cancel URL
                 ["PaymentDesc"] = "Hoopsstation app purchase",
                 ["MerchantReturnURL"] = "https://hoopsmarketing.worldpos.com.my/paystatusghl",
-                ["MerchantCallbackURL"] = "https://hoopsmarketing.worldpos.com.my/paycallback",
+                ["MerchantCallbackURL"] = "https://hoopsmarketing.worldpos.com.my/paystatusghl",
                 ["Amount"] = amount,
 
                 ["CustIP"] = postProcessPaymentRequest.Order.CustomerIp + "",

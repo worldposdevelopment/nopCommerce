@@ -77,12 +77,29 @@ namespace Nop.Services.Orders
         #region Methods
 
         #region Orders
+        /// <summary>
+        /// Gets an order
+        /// </summary>
+        /// <param name="orderId">The order identifier</param>
+        /// <returns>Order</returns>
+        /// 
+        public virtual String GetUsernameByOrder(int orderId)
+        {
+            if (orderId == 0)
+                return null;
+
+            return (from o in _orderRepository.Table
+                    join c in _customerRepository.Table on o.CustomerId equals c.Id
+                    where o.Id == orderId
+                    select c.Username).FirstOrDefault();
+        }
 
         /// <summary>
         /// Gets an order
         /// </summary>
         /// <param name="orderId">The order identifier</param>
         /// <returns>Order</returns>
+        /// 
         public virtual Order GetOrderById(int orderId)
         {
             if (orderId == 0)

@@ -41,6 +41,7 @@ using Nop.Web.Areas.Admin.Models.Localization;
 using Nop.Web.Framework.Models.Extensions;
 using Nop.Web.Framework.Security;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Nop.Core.Domain.Payments;
 
 namespace Nop.Web.Areas.Admin.Factories
 {
@@ -998,9 +999,10 @@ namespace Nop.Web.Areas.Admin.Factories
         /// <returns>Common statistics model</returns>
         public virtual CommonStatisticsModel PrepareCommonStatisticsModel()
         {
+            //changed to show only paid orders
             var model = new CommonStatisticsModel
             {
-                NumberOfOrders = _orderService.SearchOrders(pageIndex: 0, pageSize: 1, getOnlyTotalCount: true).TotalCount
+                NumberOfOrders = _orderService.SearchOrders(pageIndex: 0, psIds: new List<int>() {30}, pageSize: 1, getOnlyTotalCount: true).TotalCount
             };
 
             var customerRoleIds = new[] { _customerService.GetCustomerRoleBySystemName(NopCustomerDefaults.RegisteredRoleName).Id };

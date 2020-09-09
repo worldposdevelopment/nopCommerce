@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Nop.Core.Domain.Customers;
 using Nop.Plugin.Misc.WebAPI.DTO;
 using Nop.Plugin.Misc.WebAPI.Filter;
-using Nop.Plugin.Misc.WebAPI.Services;
+
 using Nop.Services.Common;
 using Nop.Services.Customers;
 using Nop.Services.Logging;
@@ -26,16 +26,16 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
         private readonly ICustomerRegistrationService _customerRegistrationService;
         private readonly CustomerSettings _customerSettings;
         private readonly ICustomerService _customerService;
-        private readonly IUserService _userValidationService;
+        //private readonly IUserService _userValidationService;
         private readonly ILogger _logger;
         private readonly IAddressService _addressService;
         private readonly IGenericAttributeService _genericAttributeService;
-        public AuthController(ICustomerRegistrationService customerRegistrationService, CustomerSettings customerSettings, ICustomerService customerService, IUserService userValidationService, ILogger logger, IAddressService addressService, IGenericAttributeService genericAttributeService)
+        public AuthController(ICustomerRegistrationService customerRegistrationService, CustomerSettings customerSettings, ICustomerService customerService, ILogger logger, IAddressService addressService, IGenericAttributeService genericAttributeService)
         {
             _customerRegistrationService = customerRegistrationService;
             _customerSettings = customerSettings;
             _customerService = customerService;
-            _userValidationService = userValidationService;
+            //_userValidationService = userValidationService;
             _logger = logger;
             _addressService = addressService;
             _genericAttributeService = genericAttributeService;
