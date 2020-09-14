@@ -51,18 +51,18 @@ namespace Nop.Web.Areas.Admin.Controllers
         public virtual IActionResult Index()
         {
             //display a warning to a store owner if there are some error
-            if (_permissionService.Authorize(StandardPermissionProvider.ManageMaintenance))
-            {
-                var warnings = _commonModelFactory.PrepareSystemWarningModels();
-                if (warnings.Any(warning => warning.Level == SystemWarningLevel.Fail ||
-                                            warning.Level == SystemWarningLevel.CopyrightRemovalKey ||
-                                            warning.Level == SystemWarningLevel.Warning))
-                    _notificationService.WarningNotification(
-                        string.Format(_localizationService.GetResource("Admin.System.Warnings.Errors"),
-                        Url.Action("Warnings", "Common")),
-                        //do not encode URLs
-                        false);
-            }
+            //if (_permissionService.Authorize(StandardPermissionProvider.ManageMaintenance))
+            //{
+            //    var warnings = _commonModelFactory.PrepareSystemWarningModels();
+            //    if (warnings.Any(warning => warning.Level == SystemWarningLevel.Fail ||
+            //                                warning.Level == SystemWarningLevel.CopyrightRemovalKey ||
+            //                                warning.Level == SystemWarningLevel.Warning))
+            //        _notificationService.WarningNotification(
+            //            string.Format(_localizationService.GetResource("Admin.System.Warnings.Errors"),
+            //            Url.Action("Warnings", "Common")),
+            //            //do not encode URLs
+            //            false);
+            //}
 
             //prepare model
             var model = _homeModelFactory.PrepareDashboardModel(new DashboardModel());

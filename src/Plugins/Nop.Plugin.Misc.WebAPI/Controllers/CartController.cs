@@ -139,7 +139,7 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
                     customer.BillingAddressId = optionid;
                     _customerService.UpdateCustomer(customer);
                     SetShippingOption("Shipping.FixedByWeightByTotal",
-                                                   "Hoops Station Shipping",
+                                                   "DHL",
                                                   _storeContext.CurrentStore.Id,
                                                    customer,
                                                   _shoppingCartService.GetShoppingCart(customer, shoppingCartType).ToList(), _addressService.GetAddressById(optionid));
@@ -382,7 +382,7 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
                 if (order.PickupInStore == false)
                 {
                     isValid = SetShippingOption("Shipping.FixedByWeightByTotal",
-                                               "Hoops Station Shipping",
+                                               "DHL",
                                               _storeContext.CurrentStore.Id,
                                                customer,
                                               _shoppingCartService.GetShoppingCart(customer, ShoppingCartType.OnlineRaffles).ToList(), _customerService.GetCustomerShippingAddress(customer));
@@ -1087,7 +1087,7 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
             else
             {
                 isValid = SetShippingOption("Shipping.FixedByWeightByTotal",
-                                               "Hoops Station Shipping",
+                                               "DHL",
                                               _storeContext.CurrentStore.Id,
                                                customer,
                                               selectedcart, address);
@@ -1105,7 +1105,7 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
                     var shippingOptions = shippingOptionResponse.ShippingOptions.ToList();
 
                     var shippingOption = shippingOptions
-                        .Find(so => !string.IsNullOrEmpty(so.Name) && so.Name.Equals("Hoops Station Shipping", StringComparison.InvariantCultureIgnoreCase));
+                        .Find(so => !string.IsNullOrEmpty(so.Name) && so.Name.Equals("DHL", StringComparison.InvariantCultureIgnoreCase));
 
                     //_genericAttributeService.SaveAttribute(customer,
                     //    NopCustomerDefaults.SelectedShippingOptionAttribute,
@@ -1459,7 +1459,7 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
                 if (order.PickupInStore == false)
                 {
                     isValid = SetShippingOption("Shipping.FixedByWeightByTotal",
-                                               "Hoops Station Shipping",
+                                               "DHL",
                                               _storeContext.CurrentStore.Id,
                                                customer,
                                               shoppingcart, _customerService.GetCustomerShippingAddress(customer));
