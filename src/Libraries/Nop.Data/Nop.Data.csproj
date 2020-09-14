@@ -22,7 +22,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Nop.Core\Nop.Core.csproj" />
-
   </ItemGroup>
 
 </Project>

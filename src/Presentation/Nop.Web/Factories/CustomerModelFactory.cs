@@ -823,7 +823,8 @@ namespace Nop.Web.Factories
                 _addressModelFactory.PrepareAddressModel(addressModel,
                     address: address,
                     excludeProperties: false,
-                    addressSettings: _addressSettings);
+                    addressSettings: _addressSettings,
+                    loadCountries: () => _countryService.GetAllCountries(_workContext.WorkingLanguage.Id));
                 model.Addresses.Add(addressModel);
             }
             return model;

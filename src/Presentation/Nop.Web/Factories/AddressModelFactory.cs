@@ -216,60 +216,60 @@ namespace Nop.Web.Factories
             }
 
             //countries and states
-            //if (addressSettings.CountryEnabled && loadCountries != null)
-            //{
-            //    //var countries = loadCountries();
+            if (addressSettings.CountryEnabled && loadCountries != null)
+            {
+                var countries = loadCountries();
 
-            //    //if (_addressSettings.PreselectCountryIfOnlyOne && countries.Count == 1)
-            //    //{
-            //    //    model.CountryId = countries[0].Id;
-            //    //}
-            //    //else
-            //    //{
-            //    //    model.AvailableCountries.Add(new SelectListItem { Text = _localizationService.GetResource("Address.SelectCountry"), Value = "0" });
-            //    //}
+                if (_addressSettings.PreselectCountryIfOnlyOne && countries.Count == 1)
+                {
+                    model.CountryId = countries[0].Id;
+                }
+                else
+                {
+                    model.AvailableCountries.Add(new SelectListItem { Text = _localizationService.GetResource("Address.SelectCountry"), Value = "0" });
+                }
 
-            //    //foreach (var c in countries)
-            //    //{
-            //    //    model.AvailableCountries.Add(new SelectListItem
-            //    //    {
-            //    //        Text = _localizationService.GetLocalized(c, x => x.Name),
-            //    //        Value = c.Id.ToString(),
-            //    //        Selected = c.Id == model.CountryId
-            //    //    });
-            //    //}
+                foreach (var c in countries)
+                {
+                    model.AvailableCountries.Add(new SelectListItem
+                    {
+                        Text = _localizationService.GetLocalized(c, x => x.Name),
+                        Value = c.Id.ToString(),
+                        Selected = c.Id == model.CountryId
+                    });
+                }
 
-            //    //if (addressSettings.StateProvinceEnabled)
-            //    //{
-            //    //    var languageId = EngineContext.Current.Resolve<IWorkContext>().WorkingLanguage.Id;
-            //    //    var states = _stateProvinceService
-            //    //        .GetStateProvincesByCountryId(model.CountryId ?? 0, languageId)
-            //    //        .ToList();
-            //    //    if (states.Any())
-            //    //    {
-            //    //        model.AvailableStates.Add(new SelectListItem { Text = _localizationService.GetResource("Address.SelectState"), Value = "0" });
+                if (addressSettings.StateProvinceEnabled)
+                {
+                    var languageId = EngineContext.Current.Resolve<IWorkContext>().WorkingLanguage.Id;
+                    var states = _stateProvinceService
+                        .GetStateProvincesByCountryId(model.CountryId ?? 0, languageId)
+                        .ToList();
+                    if (states.Any())
+                    {
+                        model.AvailableStates.Add(new SelectListItem { Text = _localizationService.GetResource("Address.SelectState"), Value = "0" });
 
-            //    //        foreach (var s in states)
-            //    //        {
-            //    //            model.AvailableStates.Add(new SelectListItem
-            //    //            {
-            //    //                Text = _localizationService.GetLocalized(s, x => x.Name),
-            //    //                Value = s.Id.ToString(),
-            //    //                Selected = (s.Id == model.StateProvinceId)
-            //    //            });
-            //    //        }
-            //    //    }
-            //    //    else
-            //    //    {
-            //    //        var anyCountrySelected = model.AvailableCountries.Any(x => x.Selected);
-            //    //        model.AvailableStates.Add(new SelectListItem
-            //    //        {
-            //    //            Text = _localizationService.GetResource(anyCountrySelected ? "Address.Other" : "Address.SelectState"),
-            //    //            Value = "0"
-            //    //        });
-            //    //    }
-            //    //}
-            //}
+                        foreach (var s in states)
+                        {
+                            model.AvailableStates.Add(new SelectListItem
+                            {
+                                Text = _localizationService.GetLocalized(s, x => x.Name),
+                                Value = s.Id.ToString(),
+                                Selected = (s.Id == model.StateProvinceId)
+                            });
+                        }
+                    }
+                    else
+                    {
+                        var anyCountrySelected = model.AvailableCountries.Any(x => x.Selected);
+                        model.AvailableStates.Add(new SelectListItem
+                        {
+                            Text = _localizationService.GetResource(anyCountrySelected ? "Address.Other" : "Address.SelectState"),
+                            Value = "0"
+                        });
+                    }
+                }
+            }
 
             //form fields
             model.CompanyEnabled = addressSettings.CompanyEnabled;

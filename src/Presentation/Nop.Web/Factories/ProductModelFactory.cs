@@ -1179,7 +1179,7 @@ namespace Nop.Web.Factories
                 HasSampleDownload = product.IsDownload && product.HasSampleDownload,
                 DisplayDiscontinuedMessage = !product.Published && _catalogSettings.DisplayDiscontinuedMessageForUnpublishedProducts,
                 AvailableEndDate = product.AvailableEndDateTimeUtc,
-                IsOnlineRafflePrize = product.IsOnlineRafflePrize,
+                IsOnlineRafflePrize = product.IsOnlineRafflePrize, 
                 IsOfflineRafflePrize = product.IsOfflineRafflePrize,
                 IsPrelaunch = product.IsPrelaunch,
                 PrelaunchStartDateTime = product.PrelaunchStartDateTime,
@@ -1187,7 +1187,7 @@ namespace Nop.Web.Factories
 
 
 
-            };
+    };
 
             //automatically generate product description?
             if (_seoSettings.GenerateProductMetaDescription && string.IsNullOrEmpty(model.MetaDescription))

@@ -1056,7 +1056,7 @@ namespace Nop.Web.Factories
                 MetaKeywords = _localizationService.GetLocalized(vendor, x => x.MetaKeywords),
                 MetaDescription = _localizationService.GetLocalized(vendor, x => x.MetaDescription),
                 MetaTitle = _localizationService.GetLocalized(vendor, x => x.MetaTitle),
-             //   SeName = _urlRecordService.GetSeName(vendor),
+                SeName = _urlRecordService.GetSeName(vendor),
                 AllowCustomersToContactVendors = _vendorSettings.AllowCustomersToContactVendors
             };
 
@@ -1070,7 +1070,6 @@ namespace Nop.Web.Factories
                 vendor.PageSizeOptions,
                 vendor.PageSize);
             PrepareSizeOptions(model.PagingFilteringContext, command);
-
             //products
             var products = _productService.SearchProducts(out _,
                 true,

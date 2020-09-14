@@ -316,7 +316,7 @@ namespace Nop.Web.Areas.Admin.Factories
                 if (model == null)
                 {
                     model = vendor.ToModel<VendorModel>();
-                    //model.SeName = _urlRecordService.GetSeName(vendor, 0, true, false);
+                    model.SeName = _urlRecordService.GetSeName(vendor, 0, true, false);
                 }
 
                 //define localized model configuration action
@@ -327,7 +327,7 @@ namespace Nop.Web.Areas.Admin.Factories
                     locale.MetaKeywords = _localizationService.GetLocalized(vendor, entity => entity.MetaKeywords, languageId, false, false);
                     locale.MetaDescription = _localizationService.GetLocalized(vendor, entity => entity.MetaDescription, languageId, false, false);
                     locale.MetaTitle = _localizationService.GetLocalized(vendor, entity => entity.MetaTitle, languageId, false, false);
-                  //  locale.SeName = _urlRecordService.GetSeName(vendor, languageId, false, false);
+                    locale.SeName = _urlRecordService.GetSeName(vendor, languageId, false, false);
                 };
 
                 //prepare associated customers
