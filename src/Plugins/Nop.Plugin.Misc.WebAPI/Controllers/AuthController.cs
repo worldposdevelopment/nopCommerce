@@ -146,7 +146,8 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
             {
                 if (customerrole.Name != "Registered" &&
                     customerrole.Name != "DEV" &&
-                    customerrole.Name != "Vendors")
+                    customerrole.Name != "Vendors" &&
+                    customerrole.Name != "HOOPS")
                     _customerService.RemoveCustomerRoleMapping(customer, customerrole);
 
 

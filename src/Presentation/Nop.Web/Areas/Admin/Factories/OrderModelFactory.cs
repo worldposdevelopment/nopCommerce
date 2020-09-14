@@ -1726,9 +1726,11 @@ namespace Nop.Web.Areas.Admin.Factories
                 throw new ArgumentNullException(nameof(searchModel));
 
             //get bestsellers
+            //added only paid products
             var bestsellers = _orderReportService.BestSellersReport(showHidden: true,
                 vendorId: _workContext.CurrentVendor?.Id ?? 0,
                 orderBy: searchModel.OrderBy,
+                ps: PaymentStatus.Paid,
                 pageIndex: searchModel.Page - 1, pageSize: searchModel.PageSize);
 
             //prepare list model

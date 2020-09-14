@@ -2720,6 +2720,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
                 return AccessDeniedDataTablesJson();
 
+            
             //prepare model
             var model = _orderModelFactory.PrepareBestsellerBriefListModel(searchModel);
 
