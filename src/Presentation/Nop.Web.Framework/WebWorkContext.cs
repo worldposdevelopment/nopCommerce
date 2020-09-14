@@ -254,17 +254,16 @@ namespace Nop.Web.Framework
                 if (customer == null || customer.Deleted || !customer.Active || customer.RequireReLogin)
                 {
                     //create guest if not exists
-                    // customer = _customerService.InsertGuestCustomer();
-                    customer = _customerService.GetCustomerByUsername("Guest");
+                    customer = _customerService.InsertGuestCustomer();
                 }
 
                 if (!customer.Deleted && customer.Active && !customer.RequireReLogin)
                 {
                     //set customer cookie
-                    //    SetCustomerCookie(customer.CustomerGuid);
+                    SetCustomerCookie(customer.CustomerGuid);
 
                     //cache the found customer
-                    customer = _customerService.GetCustomerByUsername("Guest");
+                    _cachedCustomer = customer;
                 }
 
                 return _cachedCustomer;
