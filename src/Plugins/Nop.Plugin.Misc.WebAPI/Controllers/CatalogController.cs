@@ -123,7 +123,7 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
             _workContext.CurrentCustomer = customer;
 
             // var vendor = _vendorService.GetVendorById(1);
-            var category = _categoryService.GetCategoryById(2);
+            var category = _categoryService.GetCategoryById(296);
             var model = _catalogModelFactory.PrepareCategoryModel(category, command);
            // var model = _catalogModelFactory.PrepareVendorModel(vendor, command);
           //  _logger.Information("GetCatalogReturn: " + model.ToJson(), null, null);

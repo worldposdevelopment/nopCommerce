@@ -568,7 +568,7 @@ namespace Nop.Services.Catalog
             bool visibleIndividuallyOnly = false,
             bool markedAsNewOnly = false,
             bool? featuredProducts = null,
-             string size = null,
+            // string size = null,
             decimal? priceMin = null,
             decimal? priceMax = null,
             int productTagId = 0,
@@ -587,7 +587,7 @@ namespace Nop.Services.Catalog
             return SearchProducts(out var _, false,
                 pageIndex, pageSize, categoryIds, manufacturerId,
                 storeId, vendorId, warehouseId,
-                productType, visibleIndividuallyOnly, markedAsNewOnly, featuredProducts, size,
+                productType, visibleIndividuallyOnly, markedAsNewOnly, featuredProducts,
                 priceMin, priceMax, productTagId, keywords, searchDescriptions, searchManufacturerPartNumber, searchSku,
                 searchProductTags, languageId, filteredSpecs,
                 orderBy, showHidden, overridePublished);
@@ -641,7 +641,7 @@ namespace Nop.Services.Catalog
             bool visibleIndividuallyOnly = false,
             bool markedAsNewOnly = false,
             bool? featuredProducts = null,
-             string size = null,
+           //  string size = null,
             decimal? priceMin = null,
             decimal? priceMax = null,
             int productTagId = 0,
@@ -729,7 +729,7 @@ namespace Nop.Services.Catalog
             var pShowHidden = SqlParameterHelper.GetBooleanParameter("ShowHidden", showHidden);
             var pOverridePublished = SqlParameterHelper.GetBooleanParameter("OverridePublished", overridePublished);
             var pLoadFilterableSpecificationAttributeOptionIds = SqlParameterHelper.GetBooleanParameter("LoadFilterableSpecificationAttributeOptionIds", loadFilterableSpecificationAttributeOptionIds);
-            var pSize = SqlParameterHelper.GetStringParameter("SizeKeywords", size);
+          //  var pSize = SqlParameterHelper.GetStringParameter("SizeKeywords", size);
 
             //prepare output parameters
             var pFilterableSpecificationAttributeOptionIds = SqlParameterHelper.GetOutputStringParameter("FilterableSpecificationAttributeOptionIds");
@@ -767,7 +767,7 @@ namespace Nop.Services.Catalog
                 pOverridePublished,
                 pLoadFilterableSpecificationAttributeOptionIds,
                 pFilterableSpecificationAttributeOptionIds,
-                pTotalRecords, pSize).ToList();
+                pTotalRecords).ToList();
 
             //get filterable specification attribute option identifier
             var filterableSpecificationAttributeOptionIdsStr =

@@ -453,7 +453,7 @@ namespace Nop.Web.Factories
                        categoryIds: new List<int> { category.Id },
                        storeId: _storeContext.CurrentStore.Id,
                        visibleIndividuallyOnly: true,
-                       featuredProducts: true, size: command.Size);
+                       featuredProducts: true);
 
                     return featuredProducts.TotalCount > 0;
                 });
@@ -466,7 +466,7 @@ namespace Nop.Web.Factories
                        categoryIds: new List<int> { category.Id },
                        storeId: _storeContext.CurrentStore.Id,
                        visibleIndividuallyOnly: true,
-                       featuredProducts: true, size: command.Size);
+                       featuredProducts: true);
                 }
 
                 if (featuredProducts != null)
@@ -494,7 +494,7 @@ namespace Nop.Web.Factories
                 filteredSpecs: alreadyFilteredSpecOptionIds,
                 orderBy: (ProductSortingEnum)command.OrderBy,
                 pageIndex: command.PageNumber - 1,
-                pageSize: command.PageSize, size: command.Size);
+                pageSize: command.PageSize);
             model.Products = _productModelFactory.PrepareProductOverviewModels(products).ToList();
 
             if (command.OrderBy.HasValue)
@@ -871,7 +871,7 @@ namespace Nop.Web.Factories
                        manufacturerId: manufacturer.Id,
                        storeId: _storeContext.CurrentStore.Id,
                        visibleIndividuallyOnly: true,
-                       featuredProducts: true, size: command.Size);
+                       featuredProducts: true);
 
                     return featuredProducts.TotalCount > 0;
                 });
@@ -884,7 +884,7 @@ namespace Nop.Web.Factories
                        manufacturerId: manufacturer.Id,
                        storeId: _storeContext.CurrentStore.Id,
                        visibleIndividuallyOnly: true,
-                       featuredProducts: true, size: command.Size);
+                       featuredProducts: true);
                 }
 
                 if (featuredProducts != null)
@@ -903,7 +903,7 @@ namespace Nop.Web.Factories
                 priceMax: maxPriceConverted,
                 orderBy: (ProductSortingEnum)command.OrderBy,
                 pageIndex: command.PageNumber - 1,
-                pageSize: command.PageSize,size: command.Size);
+                pageSize: command.PageSize);
             model.Products = _productModelFactory.PrepareProductOverviewModels(products).ToList();
 
             model.PagingFilteringContext.LoadPagedList(products);
@@ -1078,7 +1078,7 @@ namespace Nop.Web.Factories
                 visibleIndividuallyOnly: true,
                 orderBy: (ProductSortingEnum)command.OrderBy,
                 pageIndex: command.PageNumber - 1,
-                pageSize: command.PageSize, size: command.Size);
+                pageSize: command.PageSize);
             model.Products = _productModelFactory.PrepareProductOverviewModels(products).ToList();
 
             model.PagingFilteringContext.LoadPagedList(products);
@@ -1648,7 +1648,7 @@ namespace Nop.Web.Factories
                         orderBy: (ProductSortingEnum)command.OrderBy,
                         pageIndex: command.PageNumber - 1,
                         pageSize: command.PageSize,
-                        vendorId: vendorId, size: command.Size);
+                        vendorId: vendorId);
                     model.Products = _productModelFactory.PrepareProductOverviewModels(products).ToList();
 
                     model.NoResults = !model.Products.Any();
