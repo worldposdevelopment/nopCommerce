@@ -197,6 +197,31 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
                 model.InWishlist = true;
             return Ok(model);
         }
+        [HttpGet("api/getrelatedproducts")]
+        public IActionResult RelatedProducts(int productId, string mobileno)
+        {
+
+            var customer = _customerService.GetCustomerByUsername(mobileno);
+            _workContext.CurrentCustomer = customer;
+
+            //load and cache report
+            var productIds = _productService.GetRelatedProductsByProductId1(productId).Select(x => x.ProductId2).ToArray();
+
+            //load products
+            var products = _productService.GetProductsByIds(productIds);
+            //ACL and store mapping
+            //products = products.Where(p => _aclService.Authorize(p) && _storeMappingService.Authorize(p)).ToList();
+            //availability dates
+            products = products.Where(p => _productService.ProductIsAvailable(p)).ToList();
+            //visible individually
+            products = products.Where(p => p.VisibleIndividually).ToList();
+
+            if (!products.Any())
+                return Content(string.Empty);
+
+            var model = _productModelFactory.PrepareProductOverviewModels(products, true, true, null).ToList();
+            return Ok(model);
+        }
         //[HttpGet("api/filtersize")]
         //public virtual IActionResult Filterbysize(SearchModel model, CatalogPagingFilteringModel command, string name, string mobileno)
         //{
