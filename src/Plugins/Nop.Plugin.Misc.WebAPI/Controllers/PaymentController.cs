@@ -279,12 +279,132 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
                 order.CaptureTransactionId = transactionid;
                 order.CardType = paymentmethod;
                 _orderService.UpdateOrder(order);
-          
+          if(_orderProcessingService.CanCancelOrder(order))
                 _orderProcessingService.CancelOrder(order, false);
               
                 return Ok(new PaymentDetailsDTO { ordernumber = ordernumber, total = _priceFormatter.FormatPrice(order.OrderTotal), mobileno = customer.Username, status = false });
             }
         }
+
+
+        [HttpGet("api/resendorder")]
+        public IActionResult ResendOrder(string ordernumber)
+        {
+
+          
+                var order = _orderService.GetOrderByCustomOrderNumber(ordernumber);
+
+                if (order == null)
+                    return NotFound();
+                var customer = _customerService.GetCustomerById(order.CustomerId);
+                _workContext.CurrentCustomer = customer;
+
+                //order note
+                _orderService.InsertOrderNote(new OrderNote
+                {
+                    OrderId = order.Id,
+                    Note = "Order resent to smart",
+                    DisplayToCustomer = false,
+                    CreatedOnUtc = DateTime.UtcNow
+                });
+
+
+                var smartDo = new SmartDo
+                {
+                    DocumentHeader = new Documentheader
+                    {
+                        AcCusInvoiceMID = order.CustomOrderNumber,
+                        AcLocationID = "APP",
+                        DocumentDate = "/Date(" + Convert.ToInt64((DateTime.Now.Date - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds) + ")/",
+                        DeliveryDate = "/Date(" + Convert.ToInt64((DateTime.Now.AddDays(7).Date - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds) + ")/",
+                        DocumentNetAmount = order.OrderTotal,
+                        DocumentCentBalance = 0,
+                        DocumentFinalAmount = order.OrderTotal,
+                        ShipToAddress1 = "",
+                        ShipToAddress2 = "",
+                        ShipToAddress3 = "",
+                        ShipToAddress4 = "",
+                        ShipToAttention = "",
+                        ShipToContact1 = "",
+                        ShipToContact2 = "",
+                        DocumentRemark = "",
+                        RefDocumentNo = "",
+                        DocumentYourReference = "",
+                        ExtraRemark1 = "",
+                        ExtraRemark2 = "",
+                        ExtraRemark3 = "",
+                        ExtraRemark4 = "",
+                        ShipToFax = "",
+                        ShipToPhone1 = "",
+                        ShipToPhone2 = "",
+                        ShipToRemark = "",
+                        ShipToShipVia = "",
+                        AcCustomerID = customer.Username
+
+
+
+                    }
+                };
+
+
+
+                int itemcount = 0;
+                var orderitems = _orderService.GetOrderItems(order.Id);
+                foreach (var item in orderitems)
+
+                {
+                    var product = _productService.GetProductById(item.ProductId);
+                    var newSmartDetail = new Documentdetail
+                    {
+                        AcCusInvoiceMID = order.CustomOrderNumber,
+                        AcStockID = _productService.FormatSku(product, item.AttributesXml),
+                        ItemDiscountAmount = item.DiscountAmountInclTax / item.Quantity,
+                        ItemUnitPrice = (item.DiscountAmountInclTax + item.UnitPriceInclTax) / item.Quantity,
+                        ItemGrossTotal = (item.DiscountAmountInclTax + item.UnitPriceInclTax) * item.Quantity,
+                        ItemQuantity = item.Quantity,
+                        ItemTotalPrice = item.PriceInclTax,
+                        AcStockUOMID = "UNIT",
+                        ItemRemark1 = product.Name,
+                        ItemNo = (++itemcount).ToString()
+
+                    };
+                    smartDo.DocumentDetails.Add(newSmartDetail);
+                }
+                if (order.OrderShippingInclTax > 0)
+                {
+
+                    var newSmartDetail = new Documentdetail
+                    {
+                        AcCusInvoiceMID = order.CustomOrderNumber,
+                        AcStockID = "SVC001",
+                        ItemDiscountAmount = 0,
+                        ItemUnitPrice = order.OrderShippingInclTax,
+                        ItemGrossTotal = order.OrderShippingInclTax,
+                        ItemQuantity = 1,
+                        ItemTotalPrice = order.OrderShippingInclTax,
+                        AcStockUOMID = "UNIT",
+                        ItemRemark1 = "Shipping",
+
+                        ItemNo = (++itemcount).ToString()
+
+                    };
+                    smartDo.DocumentDetails.Add(newSmartDetail);
+
+                }
+
+
+
+
+
+
+
+
+
+
+                return Ok(smartDo);
+
+            }
+
 
     }
 }

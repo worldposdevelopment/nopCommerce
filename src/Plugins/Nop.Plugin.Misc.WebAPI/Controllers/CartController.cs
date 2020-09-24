@@ -281,7 +281,49 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
 
             }
 
-            _logger.Information("Discount Return" + model.ToJson(), null, null);
+         //   _logger.Information("Discount Return" + model.ToJson(), null, null);
+
+            //return result
+            return Ok(model);
+
+        }
+
+        [HttpGet("api/removediscount")]
+        public virtual IActionResult RemoveDiscountCode(int discountId, string mobileno)
+        {
+            var customer = _customerService.GetCustomerByUsername(mobileno);
+            if (customer == null)
+            {
+                _logger.Information("Mobile number not registered", null, null);
+
+                return Ok();
+            }
+            _workContext.CurrentCustomer = customer;
+            var model = new ShoppingCartModel();
+            var discount = _discountService.GetDiscountById(discountId);
+            if (discount != null)
+                _customerService.RemoveDiscountCouponCode(_workContext.CurrentCustomer, discount.CouponCode);
+
+            var cart = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, ShoppingCartType.ShoppingCart, _storeContext.CurrentStore.Id);
+
+            model = _shoppingCartModelFactory.PrepareShoppingCartModel(model, cart);
+
+            model.TotalFee = EstimateFee(ShoppingCartType.ShoppingCart);
+            //if (addToCartWarnings.Count > 0)
+            //    return BadRequest(addToCartWarnings);
+
+
+            foreach (Nop.Web.Models.ShoppingCart.ShoppingCartModel.ShoppingCartItemModel item in model.Items)
+            {
+                var cartproduct = _productService.GetProductById(item.ProductId);
+
+                item.CustomProperties.Add("ProductAttributes", PrepareProductAttributeModels(cartproduct, null));
+
+
+
+            }
+
+        //    _logger.Information("Discount Return" + model.ToJson(), null, null);
 
             //return result
             return Ok(model);
