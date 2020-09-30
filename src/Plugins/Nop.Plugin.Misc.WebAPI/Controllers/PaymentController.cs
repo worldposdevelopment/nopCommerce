@@ -200,7 +200,7 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
                         AcCusInvoiceMID = order.CustomOrderNumber,
                         AcStockID = _productService.FormatSku(product, item.AttributesXml),
                         ItemDiscountAmount = item.DiscountAmountInclTax / item.Quantity,
-                        ItemUnitPrice = (item.DiscountAmountInclTax + item.UnitPriceInclTax) / item.Quantity,
+                        ItemUnitPrice = (item.DiscountAmountInclTax + item.UnitPriceInclTax),
                         ItemGrossTotal = (item.DiscountAmountInclTax + item.UnitPriceInclTax) * item.Quantity,
                         ItemQuantity = item.Quantity,
                         ItemTotalPrice = item.PriceInclTax,

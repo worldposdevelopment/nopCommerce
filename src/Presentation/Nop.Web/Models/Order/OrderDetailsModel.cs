@@ -87,6 +87,7 @@ namespace Nop.Web.Models.Order
         {
             public OrderItemModel()
             {
+                PickupInStore = false;
 
             }
             public Guid OrderItemGuid { get; set; }
@@ -100,6 +101,7 @@ namespace Nop.Web.Models.Order
             public string AttributeInfo { get; set; }
             public PictureModel Picture { get; set; }
             public bool HasReviewed { get; set; }
+            public bool PickupInStore { get; set; }
             public string RentalInfo { get; set; }
 
             public string VendorName { get; set; }

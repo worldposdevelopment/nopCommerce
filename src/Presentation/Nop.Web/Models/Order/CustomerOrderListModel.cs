@@ -28,7 +28,7 @@ namespace Nop.Web.Models.Order
             {
                 Items = new List<OrderItemModel>();
                 Shipments = new List<ShipmentBriefModel>();
-
+              
             }
             public string CustomOrderNumber { get; set; }
             public string OrderTotal { get; set; }
@@ -36,7 +36,9 @@ namespace Nop.Web.Models.Order
             public OrderStatus OrderStatusEnum { get; set; }
             public string OrderStatus { get; set; }
             public string PaymentStatus { get; set; }
-            public string ShippingStatus { get; set; }
+            public bool PickupInStore { get; set; }
+             public string ShippingStatus { get; set; }
+            public string ShippingMethod { get; set; }
             public DateTime CreatedOn { get; set; }
             public IList<OrderItemModel> Items { get; set; }
             public IList<ShipmentBriefModel> Shipments { get; set; }
