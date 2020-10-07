@@ -593,8 +593,8 @@ namespace Nop.Web.Areas.Admin.Controllers
                 return RedirectToAction("List");
 
             //a vendor does not have access to this functionality
-            if (_workContext.CurrentVendor != null)
-                return RedirectToAction("Edit", "Order", new { id });
+            //if (_workContext.CurrentVendor != null)
+            //    return RedirectToAction("Edit", "Order", new { id });
 
             try
             {
@@ -862,8 +862,8 @@ namespace Nop.Web.Areas.Admin.Controllers
                 return RedirectToAction("List");
 
             //a vendor does not have access to this functionality
-            if (_workContext.CurrentVendor != null)
-                return RedirectToAction("Edit", "Order", new { id });
+            //if (_workContext.CurrentVendor != null)
+            //    return RedirectToAction("Edit", "Order", new { id });
 
             try
             {
