@@ -85,13 +85,13 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
                 _orderService.InsertOrderNote(new OrderNote
                 {
                     OrderId = order.Id,
-                    Note = "Payment Exited: ",
+                    Note = "Callback without payment: ",
                     DisplayToCustomer = false,
                     CreatedOnUtc = DateTime.UtcNow
                 });
                
-                _orderService.UpdateOrder(order);
-            _orderProcessingService.CancelOrder(order, false);
+           //     _orderService.UpdateOrder(order);
+          //  _orderProcessingService.CancelOrder(order, false);
                 }
 
                 return Ok(new PaymentDetailsDTO { ordernumber = order.CustomOrderNumber, total = _priceFormatter.FormatPrice(order.OrderTotal), mobileno = customer.Username, status = false, transactionid = order.CaptureTransactionId, paymentmethod = order.CardType });
@@ -200,7 +200,7 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
                         AcCusInvoiceMID = order.CustomOrderNumber,
                         AcStockID = _productService.FormatSku(product, item.AttributesXml),
                         ItemDiscountAmount = item.DiscountAmountInclTax / item.Quantity,
-                        ItemUnitPrice = (item.DiscountAmountInclTax + item.UnitPriceInclTax),
+                        ItemUnitPrice = (item.DiscountAmountInclTax/ item.Quantity) + (item.UnitPriceInclTax),
                         ItemGrossTotal = (item.DiscountAmountInclTax + item.UnitPriceInclTax) * item.Quantity,
                         ItemQuantity = item.Quantity,
                         ItemTotalPrice = item.PriceInclTax,

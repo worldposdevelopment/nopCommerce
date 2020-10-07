@@ -101,8 +101,8 @@
                     <a asp-controller="Customer" asp-action="Edit" asp-route-id="@Model.CustomerId">@Model.CustomerInfo</a>
                 </div>
             </div>
-            @if (!Model.IsLoggedInAsVendor)
-            {
+            @*@if (!Model.IsLoggedInAsVendor)
+            {*@
                 <div class="form-group">
                     <div class="col-md-3">
                         <nop-label asp-for="OrderStatus" />
@@ -142,7 +142,7 @@
                         </div>
                     </div>
                 </div>
-            }
+            @*}
             else
             {
                 //vendors should see whether or order is cancelled
@@ -158,8 +158,8 @@
                             </strong>
                         </div>
                     </div>
-                }
-            }
+                }*@
+            @*}*@
         </div>
     </div>
     @if (!Model.IsLoggedInAsVendor)
