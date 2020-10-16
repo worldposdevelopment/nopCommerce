@@ -156,7 +156,7 @@
                                             </script>
                                         </div>
                                     </div>
-                                    <div class="form-group" @*@(Model.IsLoggedInAsVendor ? Html.Raw("style='display: none;'") : null)*@>
+                                    <div class="form-group" @(Model.IsLoggedInAsVendor ? Html.Raw("style='display: none;'") : null)>
                                         <div class="col-md-4">
                                             <nop-label asp-for="OrderStatusIds" />
                                         </div>
@@ -172,7 +172,7 @@
                                             <nop-select asp-for="PaymentStatusIds" asp-items="Model.AvailablePaymentStatuses" asp-multiple="true" />
                                         </div>
                                     </div>
-                                    <div class="form-group" @*@(Model.IsLoggedInAsVendor ? Html.Raw("style='display: none;'") : null)*@>
+                                    <div class="form-group" @(Model.IsLoggedInAsVendor ? Html.Raw("style='display: none;'") : null)>
                                         <div class="col-md-4">
                                             <nop-label asp-for="ShippingStatusIds" />
                                         </div>
@@ -291,7 +291,7 @@
                                 FooterCallback = !Model.IsLoggedInAsVendor ? "ordersfootercallback" : null,
                                 FooterColumns = !Model.IsLoggedInAsVendor ? 10 : 0,
                                 Filters = new List<FilterParameter>
-                                                {
+                                                                {
                                                     new FilterParameter(nameof(Model.StartDate), typeof(DateTime?)),
                                                     new FilterParameter(nameof(Model.EndDate), typeof(DateTime?)),
                                                     new FilterParameter(nameof(Model.OrderStatusIds)),
@@ -310,7 +310,7 @@
                                                 }
                             };
                             gridModel.ColumnCollection = new List<ColumnProperty>
-                            {
+                                            {
                                 new ColumnProperty(nameof(OrderModel.Id))
                                 {
                                     IsMasterCheckBox = true,
@@ -325,7 +325,7 @@
                                 }
                             };
                             //a vendor does not have access to this functionality
-                            if (true)
+                            if (!Model.IsLoggedInAsVendor)
                             {
                                 gridModel.ColumnCollection.Add(new ColumnProperty(nameof(OrderModel.OrderStatus))
                                 {
@@ -340,7 +340,7 @@
                                 Width = "150"
                             });
                             //a vendor does not have access to this functionality
-                            if (true)
+                            if (!Model.IsLoggedInAsVendor)
                             {
                                 gridModel.ColumnCollection.Add(new ColumnProperty(nameof(OrderModel.ShippingStatus))
                                 {
@@ -366,7 +366,7 @@
                                 Render = new RenderDate()
                             });
                             //a vendor does not have access to this functionality
-                            if (true)
+                            if (!Model.IsLoggedInAsVendor)
                             {
                                 gridModel.ColumnCollection.Add(new ColumnProperty(nameof(OrderModel.OrderTotal))
                                 {
