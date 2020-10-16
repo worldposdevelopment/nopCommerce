@@ -935,8 +935,8 @@ namespace Nop.Web.Areas.Admin.Factories
             var orderStatusIds = (searchModel.OrderStatusIds?.Contains(0) ?? true) ? null : searchModel.OrderStatusIds.ToList();
             var paymentStatusIds = (searchModel.PaymentStatusIds?.Contains(0) ?? true) ? null : searchModel.PaymentStatusIds.ToList();
             var shippingStatusIds = (searchModel.ShippingStatusIds?.Contains(0) ?? true) ? null : searchModel.ShippingStatusIds.ToList();
-            //if (_workContext.CurrentVendor != null)
-            //    searchModel.VendorId = _workContext.CurrentVendor.Id;
+            if (_workContext.CurrentVendor != null)
+                searchModel.VendorId = _workContext.CurrentVendor.Id;
             var startDateValue = !searchModel.StartDate.HasValue ? null
                 : (DateTime?)_dateTimeHelper.ConvertToUtcTime(searchModel.StartDate.Value, _dateTimeHelper.CurrentTimeZone);
             var endDateValue = !searchModel.EndDate.HasValue ? null
@@ -1726,11 +1726,9 @@ namespace Nop.Web.Areas.Admin.Factories
                 throw new ArgumentNullException(nameof(searchModel));
 
             //get bestsellers
-            //added only paid products
             var bestsellers = _orderReportService.BestSellersReport(showHidden: true,
                 vendorId: _workContext.CurrentVendor?.Id ?? 0,
                 orderBy: searchModel.OrderBy,
-                ps: PaymentStatus.Paid,
                 pageIndex: searchModel.Page - 1, pageSize: searchModel.PageSize);
 
             //prepare list model
