@@ -152,7 +152,7 @@ namespace Nop.Web.Areas.Admin.Controllers
 
             return hasVendorProducts;
         }
-        
+
         protected virtual bool HasAccessToProduct(OrderItem orderItem)
         {
             if (orderItem == null || orderItem.ProductId == 0)
@@ -166,7 +166,7 @@ namespace Nop.Web.Areas.Admin.Controllers
 
             return _productService.GetProductById(orderItem.ProductId)?.VendorId == vendorId;
         }
-        
+
         protected virtual bool HasAccessToShipment(Shipment shipment)
         {
             if (shipment == null)
@@ -1768,7 +1768,7 @@ namespace Nop.Web.Areas.Admin.Controllers
                     RentalEndDateUtc = rentalEndDate
                 };
 
-                _orderService.InsertOrderItem(orderItem);                
+                _orderService.InsertOrderItem(orderItem);
 
                 //adjust inventory
                 _productService.AdjustInventory(product, -orderItem.Quantity, orderItem.AttributesXml,
@@ -2043,7 +2043,6 @@ namespace Nop.Web.Areas.Admin.Controllers
             {
                 OrderId = order.Id,
                 TrackingNumber = model.TrackingNumber,
-                TrackingUrl = model.TrackingUrl,
                 TotalWeight = null,
                 AdminComment = model.AdminComment,
                 CreatedOnUtc = DateTime.UtcNow
@@ -2146,14 +2145,14 @@ namespace Nop.Web.Areas.Admin.Controllers
                     CreatedOnUtc = DateTime.UtcNow
                 });
 
-                if(model.CanShip)
+                if (model.CanShip)
                     _orderProcessingService.Ship(shipment, true);
 
-                if(model.CanShip && model.CanDeliver)
+                if (model.CanShip && model.CanDeliver)
                     _orderProcessingService.Deliver(shipment, true);
 
                 LogEditOrder(order.Id);
-                
+
                 _notificationService.SuccessNotification(_localizationService.GetResource("Admin.Orders.Shipments.Added"));
                 return continueEditing
                         ? RedirectToAction("ShipmentDetails", new { id = shipment.Id })
@@ -2199,7 +2198,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             //a vendor should have access only to his products
             if (_workContext.CurrentVendor != null && !HasAccessToShipment(shipment))
                 return RedirectToAction("List");
-            
+
             foreach (var shipmentItem in _shipmentService.GetShipmentItemsByShipmentId(shipment.Id))
             {
                 var orderItem = _orderService.GetOrderItemById(shipmentItem.OrderItemId);
@@ -2231,27 +2230,6 @@ namespace Nop.Web.Areas.Admin.Controllers
             return RedirectToAction("Edit", new { id = orderId });
         }
 
-        [HttpPost, ActionName("ShipmentDetails")]
-        [FormValueRequired("settrackingurl")]
-        public virtual IActionResult SetTrackingUrl(ShipmentModel model)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
-
-            //try to get a shipment with the specified id
-            var shipment = _shipmentService.GetShipmentById(model.Id);
-            if (shipment == null)
-                return RedirectToAction("List");
-
-            //a vendor should have access only to his products
-            if (_workContext.CurrentVendor != null && !HasAccessToShipment(shipment))
-                return RedirectToAction("List");
-
-            shipment.TrackingUrl = model.TrackingUrl;
-            _shipmentService.UpdateShipment(shipment);
-
-            return RedirectToAction("ShipmentDetails", new { id = shipment.Id });
-        }
         [HttpPost, ActionName("ShipmentDetails")]
         [FormValueRequired("settrackingnumber")]
         public virtual IActionResult SetTrackingNumber(ShipmentModel model)
@@ -2720,7 +2698,6 @@ namespace Nop.Web.Areas.Admin.Controllers
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
                 return AccessDeniedDataTablesJson();
 
-            
             //prepare model
             var model = _orderModelFactory.PrepareBestsellerBriefListModel(searchModel);
 
@@ -2734,8 +2711,8 @@ namespace Nop.Web.Areas.Admin.Controllers
                 return AccessDeniedDataTablesJson();
 
             //a vendor doesn't have access to this report
-           // if (_workContext.CurrentVendor != null)
-         //       return Content(string.Empty);
+            if (_workContext.CurrentVendor != null)
+                return Content(string.Empty);
 
             //prepare model
             var model = _orderModelFactory.PrepareOrderAverageReportListModel(searchModel);
@@ -2750,8 +2727,8 @@ namespace Nop.Web.Areas.Admin.Controllers
                 return AccessDeniedDataTablesJson();
 
             //a vendor doesn't have access to this report
-            //if (_workContext.CurrentVendor != null)
-            //    return Content(string.Empty);
+            if (_workContext.CurrentVendor != null)
+                return Content(string.Empty);
 
             //prepare model
             var model = _orderModelFactory.PrepareOrderIncompleteReportListModel(searchModel);
@@ -2765,8 +2742,8 @@ namespace Nop.Web.Areas.Admin.Controllers
                 return Content(string.Empty);
 
             //a vendor doesn't have access to this report
-         //   if (_workContext.CurrentVendor != null)
-         //       return Content(string.Empty);
+            if (_workContext.CurrentVendor != null)
+                return Content(string.Empty);
 
             var result = new List<object>();
 
