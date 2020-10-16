@@ -960,7 +960,7 @@ namespace Nop.Services.Common
                     shippingAddressPdf.AddCell(GetParagraph("PDFInvoice.ShippingInformation", lang, titleFont));
                     if (!string.IsNullOrEmpty(shippingAddress.Company))
                         shippingAddressPdf.AddCell(GetParagraph("PDFInvoice.Company", indent, lang, font, shippingAddress.Company));
-                    shippingAddressPdf.AddCell(GetParagraph("PDFInvoice.Name", indent, lang, font, shippingAddress.FirstName + " " + shippingAddress.LastName));
+                    shippingAddressPdf.AddCell(GetParagraph("PDFInvoice.Name", indent, lang, font, _workContext.GetCustomerFullName(username)));
                     if (_addressSettings.PhoneEnabled)
                         shippingAddressPdf.AddCell(GetParagraph("PDFInvoice.Phone", indent, lang, font, username));
                     if (_addressSettings.FaxEnabled && !string.IsNullOrEmpty(shippingAddress.FaxNumber))
@@ -1044,6 +1044,7 @@ namespace Nop.Services.Common
         protected virtual void PrintBillingInfo(int vendorId, Language lang, Font titleFont, Order order, Font font, PdfPTable addressTable)
         {
             var username = _orderService.GetUsernameByOrder(order.Id);
+            
             const string indent = "   ";
             var billingAddressPdf = new PdfPTable(1) { RunDirection = GetDirection(lang) };
             billingAddressPdf.DefaultCell.Border = Rectangle.NO_BORDER;
@@ -1055,7 +1056,7 @@ namespace Nop.Services.Common
             if (_addressSettings.CompanyEnabled && !string.IsNullOrEmpty(billingAddress.Company))
                 billingAddressPdf.AddCell(GetParagraph("PDFInvoice.Company", indent, lang, font, billingAddress.Company));
 
-            billingAddressPdf.AddCell(GetParagraph("PDFInvoice.Name", indent, lang, font, billingAddress.FirstName + " " + billingAddress.LastName));
+            billingAddressPdf.AddCell(GetParagraph("PDFInvoice.Name", indent, lang, font, _workContext.GetCustomerFullName(username)));
 
             if (_addressSettings.PhoneEnabled)
                 billingAddressPdf.AddCell(GetParagraph("PDFInvoice.Phone", indent, lang, font, username));
@@ -1290,7 +1291,7 @@ namespace Nop.Services.Common
                     doc.NewPage();
                 }
             }
-
+                
             doc.Close();
         }
 

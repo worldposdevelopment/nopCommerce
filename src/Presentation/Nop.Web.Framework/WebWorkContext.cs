@@ -19,6 +19,7 @@ using Nop.Services.Localization;
 using Nop.Services.Stores;
 using Nop.Services.Tasks;
 using Nop.Services.Vendors;
+using StackExchange.Redis;
 
 namespace Nop.Web.Framework
 {
@@ -92,6 +93,12 @@ namespace Nop.Web.Framework
         #endregion
 
         #region Utilities
+        public virtual string GetCustomerFullName(string username)
+        {
+            var customer = _customerService.GetCustomerByUsername(username);
+            var fullname = _customerService.GetCustomerFullName(customer);
+            return fullname;
+        }
 
         /// <summary>
         /// Get nop customer cookie
@@ -264,7 +271,11 @@ namespace Nop.Web.Framework
                     //    SetCustomerCookie(customer.CustomerGuid);
 
                     //cache the found customer
-                    customer = _customerService.GetCustomerByUsername("Guest");
+                    //set customer cookie
+                    SetCustomerCookie(customer.CustomerGuid);
+
+                    //cache the found customer
+                    _cachedCustomer = customer;
                 }
 
                 return _cachedCustomer;

@@ -11,6 +11,7 @@ namespace Nop.Core
     /// </summary>
     public interface IWorkContext
     {
+        string GetCustomerFullName(string username);
         /// <summary>
         /// Gets or sets the current customer
         /// </summary>

@@ -667,9 +667,8 @@
             {
                 <div class="form-group">
                     <div class="col-md-9 col-md-offset-3">
-                       @*@if (!Model.IsLoggedInAsVendor)
-                       {*@
-                            if (Model.CanCapture)
+   
+                            @if (Model.CanCapture)
                             {
                                 <button type="submit" name="captureorder" id="captureorder" class="btn btn-primary">
                                     @T("Admin.Orders.Fields.Capture")
@@ -677,7 +676,7 @@
                                 <text>&nbsp;</text>
                                 <nop-action-confirmation asp-button-id="captureorder" />
                             }
-                            if (Model.CanMarkOrderAsPaid)
+                            @if (Model.CanMarkOrderAsPaid)
                             {
                                 <button type="submit" name="markorderaspaid" id="markorderaspaid" class="btn btn-primary">
                                     @T("Admin.Orders.Fields.MarkAsPaid")
@@ -685,7 +684,7 @@
                                 <text>&nbsp;</text>
                                 <nop-action-confirmation asp-button-id="markorderaspaid" />
                             }
-                            if (Model.CanRefund)
+                            @if (Model.CanRefund)
                             {
                                 <button type="submit" name="refundorder" id="refundorder" class="btn btn-primary">
                                     @T("Admin.Orders.Fields.Refund")
@@ -693,7 +692,7 @@
                                 <text>&nbsp;</text>
                                 <nop-action-confirmation asp-button-id="refundorder" />
                             }
-                            if (Model.CanRefundOffline)
+                            @if (Model.CanRefundOffline)
                             {
                                 <button type="submit" name="refundorderoffline" id="refundorderoffline" class="btn btn-primary">
                                     @T("Admin.Orders.Fields.RefundOffline")
@@ -701,21 +700,21 @@
                                 <text>&nbsp;</text>
                                 <nop-action-confirmation asp-button-id="refundorderoffline" />
                             }
-                            if (Model.CanPartiallyRefund)
+                            @if (Model.CanPartiallyRefund)
                             {
                                 <button type="submit" id="partiallyrefundorder" name="partiallyrefundorder" onclick="javascript:OpenWindow('@(Url.Action("PartiallyRefundOrderPopup", "Order", new {id = Model.Id, online = true, btnId = "btnRefreshPage", formId = "order-form"}))', 500, 300, true); return false;" class="btn btn-primary">
                                     @T("Admin.Orders.Fields.PartialRefund")
                                 </button>
                                 <text>&nbsp;</text>
                             }
-                            if (Model.CanPartiallyRefundOffline)
+                            @if (Model.CanPartiallyRefundOffline)
                             {
                                 <button type="submit" id="partiallyrefundorderoffline" name="partiallyrefundorderoffline" onclick="javascript:OpenWindow('@(Url.Action("PartiallyRefundOrderPopup", "Order", new {id = Model.Id, online = false, btnId = "btnRefreshPage", formId = "order-form"}))', 500, 300, true); return false;" class="btn btn-primary">
                                     @T("Admin.Orders.Fields.PartialRefundOffline")
                                 </button>
                                 <text>&nbsp;</text>
                             }
-                            if (Model.CanVoid)
+                            @if (Model.CanVoid)
                             {
                                 <button type="submit" name="voidorder" id="voidorder" class="btn btn-primary">
                                     @T("Admin.Orders.Fields.Void")
@@ -723,7 +722,7 @@
                                 <text>&nbsp;</text>
                                 <nop-action-confirmation asp-button-id="voidorder" />
                             }
-                            if (Model.CanVoidOffline)
+                            @if (Model.CanVoidOffline)
                             {
                                 <button type="submit" name="voidorderoffline" id="voidorderoffline" class="btn btn-primary">
                                     @T("Admin.Orders.Fields.VoidOffline")
@@ -731,7 +730,7 @@
                                 <text>&nbsp;</text>
                                 <nop-action-confirmation asp-button-id="voidorderoffline" />
                             }
-                        @*}*@
+                     
                     </div>
                 </div>
             }
