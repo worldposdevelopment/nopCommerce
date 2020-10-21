@@ -955,6 +955,16 @@ namespace Nop.Web.Controllers
             if (_customerService.IsGuest(_workContext.CurrentCustomer) && !_orderSettings.AnonymousCheckoutAllowed)
                 return Challenge();
 
+            foreach(var item in cart)
+            {
+                _shoppingCartService.SetSelectShoppingCartItem(_workContext.CurrentCustomer, item.Id, true);
+
+            }
+       
+
+            //select all cart
+            
+
             //model
             var model = _checkoutModelFactory.PrepareConfirmOrderModel(cart);
             try

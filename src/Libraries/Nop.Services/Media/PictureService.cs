@@ -560,89 +560,93 @@ namespace Nop.Services.Media
         {
             if (picture == null)
                 return showDefaultPicture ? GetDefaultPictureUrl(targetSize, defaultPictureType, storeLocation) : string.Empty;
-
-            byte[] pictureBinary = null;
-            if (picture.IsNew)
-            {
-                DeletePictureThumbs(picture);
-                pictureBinary = LoadPictureBinary(picture);
-
-                if ((pictureBinary?.Length ?? 0) == 0)
-                    return showDefaultPicture ? GetDefaultPictureUrl(targetSize, defaultPictureType, storeLocation) : string.Empty;
-
-                //we do not validate picture binary here to ensure that no exception ("Parameter is not valid") will be thrown
-                picture = UpdatePicture(picture.Id,
-                    pictureBinary,
-                    picture.MimeType,
-                    picture.SeoFilename,
-                    picture.AltAttribute,
-                    picture.TitleAttribute,
-                    false,
-                    false);
-            }
-
-            var seoFileName = picture.SeoFilename; // = GetPictureSeName(picture.SeoFilename); //just for sure
-
-            var lastPart = GetFileExtensionFromMimeType(picture.MimeType);
-            string thumbFileName;
-            if (targetSize == 0)
-            {
-                thumbFileName = !string.IsNullOrEmpty(seoFileName)
-                    ? $"{picture.Id:0000000}_{seoFileName}.{lastPart}"
-                    : $"{picture.Id:0000000}.{lastPart}";
-            }
+            if (!String.IsNullOrEmpty(picture.VirtualPath))
+                return picture.VirtualPath;
             else
             {
-                thumbFileName = !string.IsNullOrEmpty(seoFileName)
-                    ? $"{picture.Id:0000000}_{seoFileName}_{targetSize}.{lastPart}"
-                    : $"{picture.Id:0000000}_{targetSize}.{lastPart}";
-            }
-
-            var thumbFilePath = GetThumbLocalPath(thumbFileName);
-
-            //the named mutex helps to avoid creating the same files in different threads,
-            //and does not decrease performance significantly, because the code is blocked only for the specific file.
-            using (var mutex = new Mutex(false, thumbFileName))
-            {
-                if (GeneratedThumbExists(thumbFilePath, thumbFileName))
-                    return GetThumbUrl(thumbFileName, storeLocation);
-
-                mutex.WaitOne();
-
-                //check, if the file was created, while we were waiting for the release of the mutex.
-                if (!GeneratedThumbExists(thumbFilePath, thumbFileName))
+                byte[] pictureBinary = null;
+                if (picture.IsNew)
                 {
-                    pictureBinary ??= LoadPictureBinary(picture);
+                    DeletePictureThumbs(picture);
+                    pictureBinary = LoadPictureBinary(picture);
 
                     if ((pictureBinary?.Length ?? 0) == 0)
                         return showDefaultPicture ? GetDefaultPictureUrl(targetSize, defaultPictureType, storeLocation) : string.Empty;
 
-                    byte[] pictureBinaryResized;
-                    if (targetSize != 0)
-                    {
-                        //resizing required
-                        using var image = Image.Load<Rgba32>(pictureBinary, out var imageFormat);
-                        image.Mutate(imageProcess => imageProcess.Resize(new ResizeOptions
-                        {
-                            Mode = ResizeMode.Max,
-                            Size = CalculateDimensions(image.Size(), targetSize)
-                        }));
-
-                        pictureBinaryResized = EncodeImage(image, imageFormat);
-                    }
-                    else
-                    {
-                        //create a copy of pictureBinary
-                        pictureBinaryResized = pictureBinary.ToArray();
-                    }
-
-                    SaveThumb(thumbFilePath, thumbFileName, picture.MimeType, pictureBinaryResized);
+                    //we do not validate picture binary here to ensure that no exception ("Parameter is not valid") will be thrown
+                    picture = UpdatePicture(picture.Id,
+                        pictureBinary,
+                        picture.MimeType,
+                        picture.SeoFilename,
+                        picture.AltAttribute,
+                        picture.TitleAttribute,
+                        false,
+                        false);
                 }
 
-                mutex.ReleaseMutex();
-            }
+                var seoFileName = picture.SeoFilename; // = GetPictureSeName(picture.SeoFilename); //just for sure
 
-            return GetThumbUrl(thumbFileName, storeLocation);
+                var lastPart = GetFileExtensionFromMimeType(picture.MimeType);
+                string thumbFileName;
+                if (targetSize == 0)
+                {
+                    thumbFileName = !string.IsNullOrEmpty(seoFileName)
+                        ? $"{picture.Id:0000000}_{seoFileName}.{lastPart}"
+                        : $"{picture.Id:0000000}.{lastPart}";
+                }
+                else
+                {
+                    thumbFileName = !string.IsNullOrEmpty(seoFileName)
+                        ? $"{picture.Id:0000000}_{seoFileName}_{targetSize}.{lastPart}"
+                        : $"{picture.Id:0000000}_{targetSize}.{lastPart}";
+                }
+
+                var thumbFilePath = GetThumbLocalPath(thumbFileName);
+
+                //the named mutex helps to avoid creating the same files in different threads,
+                //and does not decrease performance significantly, because the code is blocked only for the specific file.
+                using (var mutex = new Mutex(false, thumbFileName))
+                {
+                    if (GeneratedThumbExists(thumbFilePath, thumbFileName))
+                        return GetThumbUrl(thumbFileName, storeLocation);
+
+                    mutex.WaitOne();
+
+                    //check, if the file was created, while we were waiting for the release of the mutex.
+                    if (!GeneratedThumbExists(thumbFilePath, thumbFileName))
+                    {
+                        pictureBinary ??= LoadPictureBinary(picture);
+
+                        if ((pictureBinary?.Length ?? 0) == 0)
+                            return showDefaultPicture ? GetDefaultPictureUrl(targetSize, defaultPictureType, storeLocation) : string.Empty;
+
+                        byte[] pictureBinaryResized;
+                        if (targetSize != 0)
+                        {
+                            //resizing required
+                            using var image = Image.Load<Rgba32>(pictureBinary, out var imageFormat);
+                            image.Mutate(imageProcess => imageProcess.Resize(new ResizeOptions
+                            {
+                                Mode = ResizeMode.Max,
+                                Size = CalculateDimensions(image.Size(), targetSize)
+                            }));
+
+                            pictureBinaryResized = EncodeImage(image, imageFormat);
+                        }
+                        else
+                        {
+                            //create a copy of pictureBinary
+                            pictureBinaryResized = pictureBinary.ToArray();
+                        }
+
+                        SaveThumb(thumbFilePath, thumbFileName, picture.MimeType, pictureBinaryResized);
+                    }
+
+                    mutex.ReleaseMutex();
+                }
+
+                return GetThumbUrl(thumbFileName, storeLocation);
+            }
         }
 
         /// <summary>
