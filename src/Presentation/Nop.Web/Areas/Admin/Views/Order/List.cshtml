@@ -353,6 +353,11 @@
                                 Title = T("Admin.Orders.Fields.Customer").Text,
                                 Render = new RenderLink(new DataUrl("~/Admin/Customer/Edit", nameof(OrderModel.CustomerId)))
                             });
+                            gridModel.ColumnCollection.Add(new ColumnProperty(nameof(OrderModel.CustomerIp))
+                            {
+                                Title = T("Admin.Orders.Fields.CustomerIp").Text,
+                                Render = new RenderLink(new DataUrl("~/Admin/Customer/Edit", nameof(OrderModel.CustomerIp)))
+                            });
                             gridModel.ColumnCollection.Add(new ColumnProperty(nameof(OrderModel.StoreName))
                             {
                                 Title = T("Admin.Orders.Fields.Store").Text,

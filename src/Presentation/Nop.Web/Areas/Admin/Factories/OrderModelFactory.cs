@@ -981,6 +981,7 @@ namespace Nop.Web.Areas.Admin.Factories
                         CustomerEmail = billingAddress.Email,
                         CustomerFullName = $"{billingAddress.FirstName} {billingAddress.LastName}",
                         CustomerId = order.CustomerId,
+                        CustomerIp = order.CustomerIp,
                         CustomOrderNumber = order.CustomOrderNumber
                     };
 

@@ -560,10 +560,7 @@ namespace Nop.Services.Media
         {
             if (picture == null)
                 return showDefaultPicture ? GetDefaultPictureUrl(targetSize, defaultPictureType, storeLocation) : string.Empty;
-            if (!String.IsNullOrEmpty(picture.VirtualPath))
-                return picture.VirtualPath;
-            else
-            {
+          
                 byte[] pictureBinary = null;
                 if (picture.IsNew)
                 {
@@ -643,7 +640,7 @@ namespace Nop.Services.Media
                     }
 
                     mutex.ReleaseMutex();
-                }
+                
 
                 return GetThumbUrl(thumbFileName, storeLocation);
             }

@@ -1474,7 +1474,7 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
                     customer.BillingAddressId = addressid;
                     _customerService.UpdateCustomer(customer);
                 }
-
+         
 
                 var shoppingcart = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, ShoppingCartType.ShoppingCart, _storeContext.CurrentStore.Id).Where(s => s.SelectedForCheckout > 0).ToList();
                 _logger.Information("Retrieved cart", null, null);
@@ -1482,6 +1482,7 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
                 shoppingCartModel = _shoppingCartModelFactory.PrepareShoppingCartModel(shoppingCartModel, shoppingcart, true, true, true);
                 // We doesn't have to check for value because this is done by the order validator.
 
+                var checkoutitem = shoppingCartModel.Items.Where(a => a.SelectedForCheckout == 1).ToList();
                 Order order = new Order();
                 order.OrderGuid = Guid.NewGuid();
                 order.CustomerId = customer.Id;
@@ -1591,6 +1592,7 @@ namespace Nop.Plugin.Misc.WebAPI.Controllers
                 }
                 shoppingCartModel.CustomProperties.Add("paymenturl", paymenturl);
                 shoppingCartModel.CustomProperties.Add("orderguid", order.OrderGuid);
+                shoppingCartModel.CustomProperties.Add("checkoutitems", checkoutitem);
                 return Ok(shoppingCartModel);
             }
             catch (Exception ex)

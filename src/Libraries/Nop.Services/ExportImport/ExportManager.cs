@@ -1540,6 +1540,7 @@ namespace Nop.Services.ExportImport
         //        new PropertyByName<Order>("StoreId", p => p.StoreId),
                 new PropertyByName<Order>("OrderGuid", p => p.OrderGuid, ignore),
                 new PropertyByName<Order>("CustomerId", p => p.CustomerId, ignore),
+                   
                 new PropertyByName<Order>("OrderStatusId", p => p.OrderStatusId, ignore),
                 new PropertyByName<Order>("PaymentStatusId", p => p.PaymentStatusId),
                 new PropertyByName<Order>("ShippingStatusId", p => p.ShippingStatusId, ignore),
@@ -1591,8 +1592,8 @@ namespace Nop.Services.ExportImport
                 new PropertyByName<Order>("ShippingAddress2", p => orderAddress(p)?.Address2 ?? string.Empty),
                 new PropertyByName<Order>("ShippingZipPostalCode", p => orderAddress(p)?.ZipPostalCode ?? string.Empty),
                 new PropertyByName<Order>("ShippingPhoneNumber", p => purchasingCustomer(p)?.Username ?? string.Empty),
-                new PropertyByName<Order>("ShippingFaxNumber", p => orderAddress(p)?.FaxNumber ?? string.Empty)
-
+                new PropertyByName<Order>("ShippingFaxNumber", p => orderAddress(p)?.FaxNumber ?? string.Empty),
+                new PropertyByName<Order>("CustomerIP", p => p.CustomerIp)
 
                 //adding line items
                 
